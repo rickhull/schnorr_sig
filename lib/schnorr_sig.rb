@@ -12,11 +12,10 @@ module Schnorr
   class VerifyFail < Error; end
 
   GROUP = ECDSA::Group::Secp256k1
-  P = GROUP.field.prime
-  N = GROUP.order
+  N = GROUP.order       # smaller than 256**32
+  P = GROUP.field.prime # smaller than N
+  B = GROUP.byte_length # 32
 
-  FORMAT_IOS = ECDSA::Format::IntegerOctetString
-  FORMAT_POS = ECDSA::Format::PointOctetString
   FORMAT_FEOS = ECDSA::Format::FieldElementOctetString
 
   # likely returns a Bignum, larger than a 64-bit hardware integer
@@ -26,7 +25,8 @@ module Schnorr
 
   # convert a giant integer to a binary string
   def self.big2bin(bignum)
-    FORMAT_IOS.encode(bignum, GROUP.byte_length)
+    # much faster than ECDSA::Format -- thanks ParadoxV5
+    [bignum.to_s(16).rjust(B * 2, '0')].pack('H*')
   end
 
   # convert a binary string to a lowercase hex string
@@ -63,7 +63,7 @@ module Schnorr
       big2bin(val)
     when ECDSA::Point
       # BIP340: The function bytes(P), where P is a point, returns bytes(x(P)).
-      val.infinity? ? ("\x00" * 32).b : FORMAT_FEOS.encode(val.x, GROUP.field)
+      val.infinity? ? ("\x00" * B).b : FORMAT_FEOS.encode(val.x, GROUP.field)
     else
       raise(SanityCheck, val.inspect)
     end
@@ -74,13 +74,13 @@ module Schnorr
   #   The message, m:           binary
   #   Auxiliary random data, a: 32 bytes binary
   # Note: this deals with N (the order) and not P (the prime)
-  def self.sign(sk, m, a = Random.bytes(32))
+  def self.sign(sk, m, a = Random.bytes(B))
     raise(TypeError, "sk: string") unless sk.is_a? String
-    raise(SizeError, "sk: 32 bytes") unless sk.bytesize == 32
+    raise(SizeError, "sk: 32 bytes") unless sk.bytesize == B
     raise(EncodingError, "sk: binary") unless sk.encoding == Encoding::BINARY
     raise(TypeError, "m: string") unless m.is_a? String
     raise(TypeError, "a: string") unless a.is_a? String
-    raise(SizeError, "a: 32 bytes") unless a.bytesize == 32
+    raise(SizeError, "a: 32 bytes") unless a.bytesize == B
     raise(EncodingError, "a: binary") unless a.encoding == Encoding::BINARY
 
     # BIP340: Let d' = int(sk)
@@ -145,22 +145,22 @@ module Schnorr
   #   A signature, sig: 64 bytes binary
   def self.verify(pk, m, sig)
     raise(TypeError, "pk: string") unless pk.is_a? String
-    raise(SizeError, "pk: 32 bytes") unless pk.bytesize == 32
+    raise(SizeError, "pk: 32 bytes") unless pk.bytesize == B
     raise(EncodingError, "pk: binary") unless pk.encoding == Encoding::BINARY
     raise(TypeError, "m: string") unless m.is_a? String
     raise(TypeError, "sig: string") unless sig.is_a? String
-    raise(SizeError, "sig: 64 bytes") unless sig.bytesize == 64
+    raise(SizeError, "sig: 64 bytes") unless sig.bytesize == B * 2
     raise(EncodingError, "sig: binary") unless sig.encoding == Encoding::BINARY
 
     # BIP340: Let P = lift_x(int(pk))
     p = lift_x(int(pk))
 
     # BIP340: Let r = int(sig[0:32]) fail if r >= p
-    r = int(sig[0..31])
+    r = int(sig[0..B-1])
     raise(BoundsError, "r >= p") if r >= P
 
     # BIP340: Let s = int(sig[32:64]); fail if s >= n
-    s = int(sig[32..-1])
+    s = int(sig[B..-1])
     raise(BoundsError, "s >= n") if s >= N
 
     # BIP340:
@@ -218,13 +218,13 @@ module Schnorr
 
   # generate a new keypair based on random data
   def self.keypair
-    sk = Random.bytes(32)
+    sk = Random.bytes(B)
     [sk, pubkey(sk)]
   end
 
   # as above, but using SecureRandom
   def self.secure_keypair
-    sk = SecureRandom.bytes(32)
+    sk = SecureRandom.bytes(B)
     [sk, pubkey(sk)]
   end
 end
