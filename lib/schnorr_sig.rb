@@ -46,6 +46,7 @@ module Schnorr
     point.y.even? ? even_val : N - even_val
   end
 
+  # provide an int(x) function that matches BIP340
   def self.int(val)
     bin2big(val)
   end
@@ -95,7 +96,7 @@ module Schnorr
     # BIP340: Let t be the bytewise xor of bytes(d) and hash[BIP0340/aux](a)
     t = d ^ int(tagged_hash('BIP0340/aux', a))
 
-    # BIP340: Let rand = hash[BIPO0340/nonce](t || bytes(P) || m)
+    # BIP340: Let rand = hash[BIP0340/nonce](t || bytes(P) || m)
     nonce = tagged_hash('BIP0340/nonce', bytes(t) + bytes_p + m)
 
     # BIP340: Let k' = int(rand) mod n
@@ -113,8 +114,7 @@ module Schnorr
 
     # BIP340:
     #   Let e = int(hash[BIP0340/challenge](bytes(R) || bytes(P) || m)) mod n
-    chal = tagged_hash('BIP0340/challenge', bytes_r + bytes_p + m)
-    e = int(chal) % N
+    e = int(tagged_hash('BIP0340/challenge', bytes_r + bytes_p + m)) % N
 
     # BIP340: Let sig = bytes(R) || bytes((k + ed) mod n)
     sig = bytes_r + bytes((k + e * d) % N)
@@ -205,8 +205,6 @@ module Schnorr
     # BIP340: Return the unique point P such that:
     #   x(P) = x and y(P) = y    if y mod 2 = 0
     #   y(P) = p - y             otherwise
-    y = P - y if y % 2 != 0
-
-    GROUP.new_point [x,y]
+    GROUP.new_point [x, (y % 2 == 0) ? y : P - y]
   end
 end
