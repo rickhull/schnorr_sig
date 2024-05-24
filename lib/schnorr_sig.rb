@@ -86,7 +86,7 @@ module Schnorr
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
     d0 = int(sk)
-    raise(BoundsError, "d0") if d0 <= 0 or d0 >= N
+    raise(BoundsError, "d0") if !d0.positive? or d0 >= N
 
     # BIP340: Let P = d' . G
     p = dot_group(d0) # this is a point on the elliptic curve
@@ -104,7 +104,7 @@ module Schnorr
     # BIP340: Let k' = int(rand) mod n
     # BIP340: Fail if k' = 0
     k0 = int(nonce) % N
-    raise(BoundsError, "k0") if k0 == 0
+    raise(BoundsError, "k0") if !k0.positive?
 
     # BIP340: Let R = k' . G
     r = dot_group(k0) # this is a point on the elliptic curve
@@ -175,7 +175,7 @@ module Schnorr
     # BIP340: Return success iff no failure occurred before reaching this point
     big_r = dot_group(s) + p.multiply_by_scalar(e).negate
     raise(VerifyFail, "R is infinite") if big_r.infinity?
-    raise(VerifyFail, "R has odd y") unless big_r.y.even?
+    raise(VerifyFail, "R has odd y") if !big_r.y.even?
     raise(VerifyFail, "R has wrong x") if big_r.x != r
     true
   end
@@ -202,7 +202,7 @@ module Schnorr
     # BIP340: Return the unique point P such that:
     #   x(P) = x and y(P) = y    if y mod 2 = 0
     #   y(P) = p - y             otherwise
-    GROUP.new_point [x, (y % 2 == 0) ? y : P - y]
+    GROUP.new_point [x, y.even? ? y : P - y]
   end
 
   # Input
@@ -212,7 +212,7 @@ module Schnorr
     # BIP340: Fail if d' = 0 or d' >= n
     # BIP340: Return bytes(d' . G)
     d0 = int(sk)
-    raise(BoundsError, "d0") if d0 <= 0 or d0 >= N
+    raise(BoundsError, "d0") if !d0.positive? or d0 >= N
     bytes(dot_group(d0))
   end
 
