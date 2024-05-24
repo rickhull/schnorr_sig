@@ -172,7 +172,7 @@ module Schnorr
     # BIP340: Fail if is_infinite(R)
     # BIP340: Fail if not has_even_y(R)
     # BIP340: Fail if x(R) != r
-    # BIP340 return success iff no failure occurred before reaching this point
+    # BIP340: Return success iff no failure occurred before reaching this point
     big_r = dot_group(s) + p.multiply_by_scalar(e).negate
     raise(VerifyFail, "R is infinite") if big_r.infinity?
     raise(VerifyFail, "R has odd y") unless big_r.y.even?
