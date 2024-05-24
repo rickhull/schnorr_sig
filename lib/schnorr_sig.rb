@@ -132,7 +132,7 @@ module Schnorr
     raise(EncodingError, "tag: utf-8") unless tag.encoding == Encoding::UTF_8
     raise(TypeError, "msg: string") unless msg.is_a? String
 
-    # BIP430: The function hash[name](x) where x is a byte array
+    # BIP340: The function hash[name](x) where x is a byte array
     #         returns the 32-byte hash
     #         SHA256(SHA256(tag) || SHA256(tag) || x)
     #         where tag is the UTF-8 encoding of name.
@@ -145,11 +145,13 @@ module Schnorr
   #   The message, m: binary
   #   A signature, sig: 64 bytes binary
   def self.verify(pk, m, sig)
-    raise(TypeError, "pk should be a string") unless pk.is_a? String
-    raise(SizeError, "pk should be 32 bytes") unless pk.bytesize == 32
-    raise(TypeError, "m should be a string") unless m.is_a? String
-    raise(TypeError, "sig should be a string") unless sig.is_a? String
-    raise(SizeError, "sig should be 64 bytes") unless sig.bytesize == 64
+    raise(TypeError, "pk: string") unless pk.is_a? String
+    raise(SizeError, "pk: 32 bytes") unless pk.bytesize == 32
+    raise(EncodingError, "pk: binary") unless pk.encoding == Encoding::BINARY
+    raise(TypeError, "m: string") unless m.is_a? String
+    raise(TypeError, "sig: string") unless sig.is_a? String
+    raise(SizeError, "sig: 64 bytes") unless sig.bytesize == 64
+    raise(EncodingError, "sig: binary") unless sig.encoding == Encoding::BINARY
 
     # BIP340: Let P = lift_x(int(pk))
     p = lift_x(int(pk))
@@ -171,15 +173,12 @@ module Schnorr
     big_r = dot_group(s) - p.multiply_by_scalar(e)
 
     # BIP340: Fail if is_infinite(R)
-    raise(VerifyFail, "R is infinite") if big_r.infinity?
-
     # BIP340: Fail if not has_even_y(R)
-    raise(VerifyFail, "R has odd y") unless big_r.y.even?
-
     # BIP340: Fail if x(R) != r
-    raise(VerifyFail, "R has wrong x") if big_r.x != r
-
     # BIP340 return success iff no failure occurred before reaching this point
+    raise(VerifyFail, "R is infinite") if big_r.infinity?
+    raise(VerifyFail, "R has odd y") unless big_r.y.even?
+    raise(VerifyFail, "R has wrong x") if big_r.x != r
     true
   end
 
@@ -191,7 +190,7 @@ module Schnorr
     raise(TypeError, "bignum: integer") unless bignum.is_a? Integer
 
     # BIP340: Fail if x >= p
-    raise(BoundsError, "bignum") if bignum >= P or bignum < 0
+    raise(BoundsError, "bignum") if bignum >= P or bignum <= 0
 
     # BIP340: Let c = x^3 + 7 mod p
     c = (bignum**3 + 7) % P
