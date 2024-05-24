@@ -16,8 +16,6 @@ module Schnorr
   P = GROUP.field.prime # smaller than N
   B = GROUP.byte_length # 32
 
-  FORMAT_FEOS = ECDSA::Format::FieldElementOctetString
-
   # likely returns a Bignum, larger than a 64-bit hardware integer
   def self.bin2big(str)
     bin2hex(str).to_i(16)
@@ -63,7 +61,7 @@ module Schnorr
       big2bin(val)
     when ECDSA::Point
       # BIP340: The function bytes(P), where P is a point, returns bytes(x(P)).
-      val.infinity? ? ("\x00" * B).b : FORMAT_FEOS.encode(val.x, GROUP.field)
+      val.infinity? ? ("\x00" * B).b : big2bin(val.x)
     else
       raise(SanityCheck, val.inspect)
     end
