@@ -37,8 +37,9 @@ module Schnorr
     [hex].pack('H*')
   end
 
-  # val (dot) G
+  # val (dot) G, returns ECDSA::Point
   def self.dot_group(val)
+    # ecdsa_ext uses jacobian projection: 10x faster than GROUP.generator * val
     (GROUP.generator.to_jacobian * val).to_affine
   end
 
