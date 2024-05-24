@@ -4,9 +4,9 @@ This is a simple, minimal library written in Ruby for the purpose of
 calculating and verifying so-called
 [Schnorr signatures](https://en.wikipedia.org/wiki/Schnorr_signature),
 based on elliptic curve cryptography.  This cryptographic method was
-patented by Claus P. Schnorr in 1989, and the patent expired in 2010,
-and by 2021, it was adopted and popularized by the
-[Bitcoin](https://en.wikipedia.org/wiki/Bitcoin) project.
+[patented by Claus P. Schnorr in 1989](https://patents.google.com/patent/US4995082),
+and the patent expired in 2010, and by 2021, it was adopted and popularized
+by the [Bitcoin](https://en.wikipedia.org/wiki/Bitcoin) project.
 
 This work is based on [BIP340](https://bips.xyz/340), one of the many
 [Bitcoin Improvement Proposals](https://bips.xyz/), which are open documents
