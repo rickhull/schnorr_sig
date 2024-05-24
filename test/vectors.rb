@@ -27,8 +27,6 @@ table.each { |row|
   comment  = row.fetch('comment')
   result   = row.fetch('verification result') == 'TRUE'
 
-  # p [index, sk, pk, aux_rand, m, sig, result, comment]
-
   begin
     Schnorr.verify(pk, m, sig)
     if result
