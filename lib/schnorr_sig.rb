@@ -188,14 +188,14 @@ module Schnorr
   #         returns the point P for which x(P) = x[10] and has_even_y(P),
   #         or fails if x is greater than p-1 or no such point exists.
   # Note: this deals with P (the prime) and not N (the order)
-  def self.lift_x(bignum)
-    raise(TypeError, "bignum: integer") unless bignum.is_a? Integer
+  def self.lift_x(x)
+    raise(TypeError, "x: integer") unless x.is_a? Integer
 
     # BIP340: Fail if x >= p
-    raise(BoundsError, "bignum") if bignum >= P or bignum <= 0
+    raise(BoundsError, "x") if x >= P or x <= 0
 
     # BIP340: Let c = x^3 + 7 mod p
-    c = (bignum**3 + 7) % P
+    c = (x**3 + 7) % P
 
     # BIP340: Let y = c ^ ((p + 1) / 4) mod p
     # y = (c ** ((P + 1) / 4)) % P
@@ -207,7 +207,7 @@ module Schnorr
     # BIP340: Return the unique point P such that:
     #   x(P) = x and y(P) = y    if y mod 2 = 0
     #   y(P) = p - y             otherwise
-    GROUP.new_point [bignum, (y % 2 == 0) ? y : P - y]
+    GROUP.new_point [x, (y % 2 == 0) ? y : P - y]
   end
 
   # Input
