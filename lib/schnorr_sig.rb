@@ -1,5 +1,7 @@
 require 'ecdsa_ext'
+autoload :SecureRandom, 'securerandom'
 
+# This implementation is based on the spec: https://bips.xyz/340
 module Schnorr
   class BoundsError < RuntimeError; end
   class SizeError < RuntimeError; end
@@ -205,5 +207,30 @@ module Schnorr
     #   x(P) = x and y(P) = y    if y mod 2 = 0
     #   y(P) = p - y             otherwise
     GROUP.new_point [x, (y % 2 == 0) ? y : P - y]
+  end
+
+  # Input
+  #   The secret key, sk: 32 bytes binary
+  def self.pubkey(sk)
+    # BIP340: Let d' = int(sk)
+    d0 = int(sk)
+
+    # BIP340: Fail if d' = 0 or d' >= n
+    raise(BoundsError, "d0") if d0 <= 0 or d0 >= N
+
+    # BIP340: Return bytes(d' . G)
+    bytes(dot_group(d0))
+  end
+
+  # generate a new keypair based on random data
+  def self.keypair
+    sk = Random.bytes(32)
+    [sk, pubkey(sk)]
+  end
+
+  # as above, but using SecureRandom
+  def self.secure_keypair
+    sk = SecureRandom.bytes(32)
+    [sk, pubkey(sk)]
   end
 end
