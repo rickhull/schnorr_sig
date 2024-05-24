@@ -83,10 +83,9 @@ module Schnorr
     raise(EncodingError, "a: binary") unless a.encoding == Encoding::BINARY
 
     # BIP340: Let d' = int(sk)
-    d0 = int(sk)
-
     # BIP340: Fail if d' = 0 or d' >= n
-    raise(BoundsError, "sk") if d0 <= 0 or d0 >= N
+    d0 = int(sk)
+    raise(BoundsError, "d0") if d0 <= 0 or d0 >= N
 
     # BIP340: Let P = d' . G
     p = dot_group(d0) # this is a point on the elliptic curve
@@ -102,9 +101,8 @@ module Schnorr
     nonce = tagged_hash('BIP0340/nonce', bytes(t) + bytes_p + m)
 
     # BIP340: Let k' = int(rand) mod n
-    k0 = int(nonce) % N
-
     # BIP340: Fail if k' = 0
+    k0 = int(nonce) % N
     raise(BoundsError, "k0") if k0 == 0
 
     # BIP340: Let R = k' . G
@@ -119,12 +117,10 @@ module Schnorr
     e = int(tagged_hash('BIP0340/challenge', bytes_r + bytes_p + m)) % N
 
     # BIP340: Let sig = bytes(R) || bytes((k + ed) mod n)
-    sig = bytes_r + bytes((k + e * d) % N)
-
     # BIP340: Fail unless Verify(bytes(P), m, sig)
-    raise(VerifyFail) unless verify(bytes_p, m, sig)
-
     # BIP340: Return the signature sig
+    sig = bytes_r + bytes((k + e * d) % N)
+    raise(VerifyFail) unless verify(bytes_p, m, sig)
     sig
   end
 
@@ -172,12 +168,11 @@ module Schnorr
     e = int(tagged_hash('BIP0340/challenge', e)) % N
 
     # BIP340: Let R = s . G - e . P
-    big_r = dot_group(s) + p.multiply_by_scalar(e).negate
-
     # BIP340: Fail if is_infinite(R)
     # BIP340: Fail if not has_even_y(R)
     # BIP340: Fail if x(R) != r
     # BIP340 return success iff no failure occurred before reaching this point
+    big_r = dot_group(s) + p.multiply_by_scalar(e).negate
     raise(VerifyFail, "R is infinite") if big_r.infinity?
     raise(VerifyFail, "R has odd y") unless big_r.y.even?
     raise(VerifyFail, "R has wrong x") if big_r.x != r
@@ -198,8 +193,7 @@ module Schnorr
     c = (x**3 + 7) % P
 
     # BIP340: Let y = c ^ ((p + 1) / 4) mod p
-    # y = (c ** ((P + 1) / 4)) % P
-    y = c.pow((P + 1) / 4, P)
+    y = c.pow((P + 1) / 4, P) # use pow to avoid Bignum overflow
 
     # BIP340: Fail if c != y^2 mod p
     raise(SanityCheck, "c != y^2 mod p") if c != (y**2) % P
@@ -214,12 +208,10 @@ module Schnorr
   #   The secret key, sk: 32 bytes binary
   def self.pubkey(sk)
     # BIP340: Let d' = int(sk)
-    d0 = int(sk)
-
     # BIP340: Fail if d' = 0 or d' >= n
-    raise(BoundsError, "d0") if d0 <= 0 or d0 >= N
-
     # BIP340: Return bytes(d' . G)
+    d0 = int(sk)
+    raise(BoundsError, "d0") if d0 <= 0 or d0 >= N
     bytes(dot_group(d0))
   end
 
