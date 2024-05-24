@@ -46,6 +46,10 @@ module Schnorr
     point.y.even? ? even_val : N - even_val
   end
 
+  def self.int(val)
+    bin2big(val)
+  end
+
   # return a binary string
   def self.bytes(val)
     case val
@@ -76,7 +80,7 @@ module Schnorr
     raise(EncodingError, "a: binary") unless a.encoding == Encoding::BINARY
 
     # BIP340: Let d' = int(sk)
-    d0 = bin2big(sk)
+    d0 = int(sk)
 
     # BIP340: Fail if d' = 0 or d' >= n
     raise(BoundsError, "sk") if d0 <= 0 or d0 >= N
@@ -89,13 +93,13 @@ module Schnorr
     d = select_even_y(p, d0)
 
     # BIP340: Let t be the bytewise xor of bytes(d) and hash[BIP0340/aux](a)
-    t = d ^ bin2big(tagged_hash('BIP0340/aux', a))
+    t = d ^ int(tagged_hash('BIP0340/aux', a))
 
     # BIP340: Let rand = hash[BIPO0340/nonce](t || bytes(P) || m)
     nonce = tagged_hash('BIP0340/nonce', bytes(t) + bytes_p + m)
 
     # BIP340: Let k' = int(rand) mod n
-    k0 = bin2big(nonce) % N
+    k0 = int(nonce) % N
 
     # BIP340: Fail if k' = 0
     raise(BoundsError, "k0") if k0 == 0
@@ -110,7 +114,7 @@ module Schnorr
     # BIP340:
     #   Let e = int(hash[BIP0340/challenge](bytes(R) || bytes(P) || m)) mod n
     chal = tagged_hash('BIP0340/challenge', bytes_r + bytes_p + m)
-    e = bin2big(chal) % N
+    e = int(chal) % N
 
     # BIP340: Let sig = bytes(R) || bytes((k + ed) mod n)
     sig = bytes_r + bytes((k + e * d) % N)
@@ -148,20 +152,20 @@ module Schnorr
     raise(SizeError, "sig should be 64 bytes") unless sig.bytesize == 64
 
     # BIP340: Let P = lift_x(int(pk))
-    p = lift_x(bin2big(pk))
+    p = lift_x(int(pk))
 
     # BIP340: Let r = int(sig[0:32]) fail if r >= p
-    r = bin2big(sig[0..32])
+    r = int(sig[0..32])
     raise(BoundsError, "r >= p") if r >= P
 
     # BIP340: Let s = int(sig[32:64]); fail if s >= n
-    s = bin2big(sig[32..-1])
+    s = int(sig[32..-1])
     raise(BoundsError, "s >= n") if s >= N
 
     # BIP340:
     #   Let e = int(hash[BIP0340/challenge](bytes(r) || bytes(P) || m)) mod n
     e = bytes(r) + bytes(p) + m
-    e = bin2big(tagged_hash('BIP0340/challenge', e)) % N
+    e = int(tagged_hash('BIP0340/challenge', e)) % N
 
     # BIP340: Let R = s . G - e . P
     big_r = dot_group(s) - p.multiply_by_scalar(e)
