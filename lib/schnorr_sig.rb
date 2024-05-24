@@ -227,3 +227,16 @@ module Schnorr
     [sk, pubkey(sk)]
   end
 end
+
+if __FILE__ == $0
+  msg = 'hello world'
+  sk, pk = Schnorr.keypair
+  puts "Message: #{msg}"
+  puts "Secret key: #{Schnorr.bin2hex(sk)}"
+
+  sig = Schnorr.sign(sk, msg)
+  puts
+  puts "Verified signature: #{Schnorr.bin2hex(sig)}"
+  puts "Encoding: #{sig.encoding}"
+  puts "Length: #{sig.length}"
+end
