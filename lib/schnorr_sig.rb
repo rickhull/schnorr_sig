@@ -191,13 +191,13 @@ module Schnorr
     raise(BoundsError, "x") if x >= P or x <= 0
 
     # BIP340: Let c = x^3 + 7 mod p
-    c = (x**3 + 7) % P
+    c = (x.pow(3, P) + 7) % P
 
     # BIP340: Let y = c ^ ((p + 1) / 4) mod p
     y = c.pow((P + 1) / 4, P) # use pow to avoid Bignum overflow
 
     # BIP340: Fail if c != y^2 mod p
-    raise(SanityCheck, "c != y^2 mod p") if c != (y**2) % P
+    raise(SanityCheck, "c != y^2 mod p") if c != y.pow(2, P)
 
     # BIP340: Return the unique point P such that:
     #   x(P) = x and y(P) = y    if y mod 2 = 0
