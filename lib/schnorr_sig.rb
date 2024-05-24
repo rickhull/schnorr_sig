@@ -159,7 +159,7 @@ module Schnorr
     p = lift_x(int(pk))
 
     # BIP340: Let r = int(sig[0:32]) fail if r >= p
-    r = int(sig[0..32])
+    r = int(sig[0..31])
     raise(BoundsError, "r >= p") if r >= P
 
     # BIP340: Let s = int(sig[32:64]); fail if s >= n
@@ -172,7 +172,7 @@ module Schnorr
     e = int(tagged_hash('BIP0340/challenge', e)) % N
 
     # BIP340: Let R = s . G - e . P
-    big_r = dot_group(s) - p.multiply_by_scalar(e)
+    big_r = dot_group(s) + p.multiply_by_scalar(e).negate
 
     # BIP340: Fail if is_infinite(R)
     # BIP340: Fail if not has_even_y(R)
@@ -198,7 +198,8 @@ module Schnorr
     c = (bignum**3 + 7) % P
 
     # BIP340: Let y = c ^ ((p + 1) / 4) mod p
-    y = (c ** ((P + 1) / 4)) % P
+    # y = (c ** ((P + 1) / 4)) % P
+    y = c.pow((P + 1) / 4, P)
 
     # BIP340: Fail if c != y^2 mod p
     raise(SanityCheck, "c != y^2 mod p") if c != (y**2) % P
@@ -206,7 +207,7 @@ module Schnorr
     # BIP340: Return the unique point P such that:
     #   x(P) = x and y(P) = y    if y mod 2 = 0
     #   y(P) = p - y             otherwise
-    GROUP.new_point [x, (y % 2 == 0) ? y : P - y]
+    GROUP.new_point [bignum, (y % 2 == 0) ? y : P - y]
   end
 
   # Input
