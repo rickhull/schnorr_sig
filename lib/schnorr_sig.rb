@@ -55,7 +55,7 @@ module Schnorr
       big2bin(val)
     when ECDSA::Point
       # BIP340: The function bytes(P), where P is a point, returns bytes(x(P)).
-      p.infinity? ? ("\x00" * 32).b : FORMAT_FEOS.encode(p.x, GROUP.field)
+      val.infinity? ? ("\x00" * 32).b : FORMAT_FEOS.encode(val.x, GROUP.field)
     else
       raise(SanityCheck, val.inspect)
     end
