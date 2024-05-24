@@ -1,7 +1,7 @@
 require 'csv'
 require 'schnorr_sig'
 
-path = File.join(__dir__, 'vectors.csv')
+path = File.join(__dir__, '..', 'vectors.csv')
 table = CSV.read(path, headers: true)
 
 success = []
