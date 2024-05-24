@@ -34,12 +34,14 @@ gem 'schnorr_sig'
 ```
 require 'schnorr_sig'
 
+msg = 'hello world'
+
 # generate secret key and public key
 sk, pk = Schnorr.keypair
 
-# sign a message, exception raised on failure
-sig = Schnorr.sign(sk, 'hello world')
+# sign a message; exception raised on failure
+sig = Schnorr.sign(sk, msg)
 
 # the signature has already been verified, but let's check
-Schnorr.verify(pk, m, sig)  # => true
+Schnorr.verify(pk, msg, sig)  # => true
 ```
