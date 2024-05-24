@@ -3,12 +3,13 @@ autoload :SecureRandom, 'securerandom'
 
 # This implementation is based on the spec: https://bips.xyz/340
 module Schnorr
-  class BoundsError < RuntimeError; end
-  class SizeError < RuntimeError; end
-  class TypeError < RuntimeError; end
-  class SanityCheck < RuntimeError; end
-  class EncodingError < RuntimeError; end
-  class VerifyFail < RuntimeError; end
+  class Error < RuntimeError; end
+  class BoundsError < Error; end
+  class SizeError < Error; end
+  class TypeError < Error; end
+  class SanityCheck < Error; end
+  class EncodingError < Error; end
+  class VerifyFail < Error; end
 
   GROUP = ECDSA::Group::Secp256k1
   P = GROUP.field.prime
@@ -48,12 +49,12 @@ module Schnorr
     point.y.even? ? even_val : N - even_val
   end
 
-  # provide an int(x) function that matches BIP340
-  def self.int(val)
-    bin2big(val)
+  # int(x) function signature matches BIP340, returns a bignum (presumably)
+  class << self
+    alias_method :int, :bin2big
   end
 
-  # return a binary string
+  # bytes(val) function signature matches BIP340, returns a binary string
   def self.bytes(val)
     case val
     when Integer
