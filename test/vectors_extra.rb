@@ -28,16 +28,17 @@ table.each { |row|
   sig_msg = nil
   verify_msg = nil
 
-  # let's derive pk from sk
-  if !sk.empty?
-    pubkey = SchnorrSig.pubkey(sk)
-    pk_msg = pubkey == pk ? "pk match" : "pk mismatch"
-
-    calc_sig = SchnorrSig.sign(sk, m)
-    sig_msg = calc_sig == sig ? "sig match" : "sig mismatch"
-  else
+  if sk.empty?
     pk_msg = "sk empty"
     sig_msg = "sk empty"
+  else
+    # let's derive pk from sk
+    pubkey = SchnorrSig.pubkey(sk)
+    pk_msg = (pubkey == pk) ? "pk match" : "pk mismatch"
+
+    # calculate a signature
+    calc_sig = SchnorrSig.sign(sk, m)
+    sig_msg = (calc_sig == sig) ? "sig match" : "sig mismatch"
   end
 
   result = begin
@@ -45,15 +46,7 @@ table.each { |row|
            rescue SchnorrSig::Error
              false
            end
-  verify_msg = result == expected ? "verify match" : "verify mismatch"
+  verify_msg = (result == expected) ? "verify match" : "verify mismatch"
   puts [index, pk_msg, sig_msg, verify_msg].join("\t")
-  #  print '.'
 }
 puts
-
-#puts "Success: #{success.count}"
-#puts "Failure: #{failure.count}"
-
-#puts failure unless failure.empty?
-
-#exit failure.count
