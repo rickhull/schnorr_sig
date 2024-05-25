@@ -16,24 +16,14 @@ table.each { |row|
 
   index    = row.fetch('index')
   comment  = row.fetch('comment')
-  result   = row.fetch('verification result') == 'TRUE'
+  expected = row.fetch('verification result') == 'TRUE'
 
-  begin
-    Schnorr.verify(pk, m, sig)
-    if result
-      success << row
-    else
-      warn "index #{index} passed verification; expected failure"
-      failure << row
-    end
-  rescue Schnorr::Error => e
-    if !result
-      success << row
-    else
-      warn "index #{index} failed verification; expected success"
-      failure << row
-    end
-  end
+  result = begin
+             SchnorrSig.verify(pk, m, sig)
+           rescue SchnorrSig::Error
+             false
+           end
+  (result == expected ? success : failure) << row
   print '.'
 }
 puts

@@ -173,10 +173,7 @@ module SchnorrSig
     # BIP340: Fail if x(R) != r
     # BIP340: Return success iff no failure occurred before reaching this point
     big_r = dot_group(s) + p.multiply_by_scalar(e).negate
-    raise(VerifyFail, "R is infinite") if big_r.infinity?
-    raise(VerifyFail, "R has odd y") if !big_r.y.even?
-    raise(VerifyFail, "R has wrong x") if big_r.x != r
-    true
+    !big_r.infinity? and big_r.y.even? and big_r.x == r
   end
 
   # BIP340: The function lift_x(x), where x is a 256-bit unsigned integer,
