@@ -2,6 +2,7 @@ require 'rbsecp256k1'
 
 module SchnorrFast
   CONTEXT = Secp256k1::Context.create
+  Error = Secp256k1::Error
 
   def self.sign(sk, m)
     raise(TypeError, "sk: string") unless sk.is_a? String
@@ -22,13 +23,7 @@ module SchnorrFast
     raise(SizeError, "sig: 64 bytes") unless sig.bytesize == 64
     raise(EncodingError, "sig: binary") unless sig.encoding == Encoding::BINARY
 
-    begin
-      xopk = Secp256k1::XOnlyPublicKey.from_data(pk)
-    rescue Secp256k1::Error
-      return false
-    end
-
-    signature(sig).verify(m, xopk)
+    signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
   end
 
   # returns Secp256k1::KeyPair

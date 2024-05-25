@@ -20,13 +20,14 @@ table.each { |row|
 
   index    = row.fetch('index')
   comment  = row.fetch('comment')
-  result   = row.fetch('verification result') == 'TRUE'
+  expected = row.fetch('verification result') == 'TRUE'
 
-  if SchnorrFast.verify(pk, m, sig) == result
-    success << row
-  else
-    failure << row
-  end
+  result = begin
+             SchnorrFast.verify(pk, m, sig)
+           rescue SchnorrFast::Error
+             false
+           end
+  (result == expected ? success : failure) << row
   print '.'
 }
 puts
