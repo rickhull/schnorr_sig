@@ -1,5 +1,6 @@
 require 'csv'
-require 'schnorr_fast'
+require 'schnorr_sig'
+require 'schnorr_sig/fast'
 
 path = File.join(__dir__, '..', 'vectors.csv')
 table = CSV.read(path, headers: true)
@@ -7,16 +8,12 @@ table = CSV.read(path, headers: true)
 success = []
 failure = []
 
-def hex2bin(hex)
-  [hex].pack('H*')
-end
-
 table.each { |row|
-  sk       = hex2bin row.fetch('secret key')
-  pk       = hex2bin row.fetch('public key')
-  aux_rand = hex2bin row.fetch('aux_rand')
-  m        = hex2bin row.fetch('message')
-  sig      = hex2bin row.fetch('signature')
+  sk       = SchnorrSig.hex2bin row.fetch('secret key')
+  pk       = SchnorrSig.hex2bin row.fetch('public key')
+  aux_rand = SchnorrSig.hex2bin row.fetch('aux_rand')
+  m        = SchnorrSig.hex2bin row.fetch('message')
+  sig      = SchnorrSig.hex2bin row.fetch('signature')
 
   index    = row.fetch('index')
   comment  = row.fetch('comment')
