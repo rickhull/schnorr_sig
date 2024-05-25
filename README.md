@@ -65,6 +65,13 @@ attacks.
 The downside of using this implementation is a more difficult and involved
 install process, along with a certain level of inscrutability.
 
+#### Temporary Restriction
+
+Currently, **rbsecp256k1** restricts messages to exactly 32 bytes, which
+was part of the BIPS340 spec until April 2023, when the restriction was lifted.
+
+See https://github.com/etscrivner/rbsecp256k1/issues/80
+
 ## Install
 
 Install locally:
