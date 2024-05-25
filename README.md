@@ -19,7 +19,8 @@ BIP340 specifies elliptic curve `secp256k1` for use with Schnorr signatures.
 
 There are two independent implementations, one aiming for as pure Ruby as
 possible, the other aiming for speed and correctness, relying on the
-battle-tested sep256k1 library used with Bitcoin.
+battle-tested [sep256k1 library](https://github.com/bitcoin-core/secp256k1)
+provided by the Bitcoin project.
 
 ### Ruby Implementation
 
