@@ -4,9 +4,10 @@ autoload :SecureRandom, 'securerandom' # stdlib
 
 # This implementation is based on the BIP340 spec: https://bips.xyz/340
 module SchnorrSig
-  class BoundsError < InternalError; end
-  class SanityCheck < InternalError; end
-  class VerifyFail < InternalError; end
+  class Error < RuntimeError; end
+  class BoundsError < Error; end
+  class SanityCheck < Error; end
+  class VerifyFail < Error; end
 
   GROUP = ECDSA::Group::Secp256k1
   N = GROUP.order       # smaller than 256**32
