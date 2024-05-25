@@ -1,8 +1,8 @@
 module SchnorrSig
-  class InternalError < RuntimeError; end
-  class SizeError < InternalError; end
-  class TypeError < InternalError; end
-  class EncodingError < InternalError; end
+  class InputError < RuntimeError; end
+  class SizeError < InputError; end
+  class TypeError < InputError; end
+  class EncodingError < InputError; end
 
   # true or raise
   def self.integer!(i)
