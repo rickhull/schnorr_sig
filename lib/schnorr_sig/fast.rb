@@ -5,6 +5,7 @@ require 'rbsecp256k1' # gem, C extension
 module SchnorrSig
   CONTEXT = Secp256k1::Context.create
   Error = Secp256k1::Error # enable: rescue SchnorrSig::Error
+  FORCE_32_BYTE_MSG = true
 
   # Input
   #   The secret key, sk: 32 bytes binary
@@ -13,7 +14,7 @@ module SchnorrSig
   #   64 bytes binary
   def self.sign(sk, m)
     bytestring!(sk, 32) and string!(m)
-    # m = m.ljust(32, ' ')
+    m = m[0..31].ljust(32, ' ') if FORCE_32_BYTE_MSG
     CONTEXT.sign_schnorr(key_pair(sk), m).serialized
   end
 
@@ -48,6 +49,14 @@ module SchnorrSig
   def self.keypair(sk = nil)
     kp = self.key_pair(sk)
     [kp.private_key.data, kp.xonly_public_key.serialized]
+  end
+
+  # Input
+  #   The secret key, sk: 32 bytes binary
+  # Output
+  #   The public key: 32 bytes binary
+  def self.pubkey(sk)
+    keypair(sk)[1]
   end
 
   # Input
