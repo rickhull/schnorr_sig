@@ -2,22 +2,31 @@ require 'rbsecp256k1'
 
 module SchnorrFast
   CONTEXT = Secp256k1::Context.create
-  Error = Secp256k1::Error # to enable: rescue SchnorrFast::Error
+
+  Error = Secp256k1::Error          # to enable: rescue SchnorrFast::Error
   class TypeError < Error; end
   class SizeError < Error; end
   class EncodingError < Error; end
 
+  # true or raise
+  def self.string!(str)
+    str.is_a?(String) or raise(TypeError, str.class)
+  end
+
+  # true or raise
+  def self.bytestring!(str, size)
+    string!(str)
+    raise(EncodingError, str.encoding) unless str.encoding == Encoding::BINARY
+    str.size == size or raise(SizeError, str.size)
+  end
+
   # Input
   #   The secret key, sk: 32 bytes binary
-  #   The message, m:     binary
+  #   The message, m:     (binary)
   # Output
   #   64 bytes binary
   def self.sign(sk, m)
-    raise(TypeError, "sk: string") unless sk.is_a? String
-    raise(SizeError, "sk: 32 bytes") unless sk.bytesize == B
-    raise(EncodingError, "sk: binary") unless sk.encoding == Encoding::BINARY
-    raise(TypeError, "m: string") unless m.is_a? String
-
+    bytestring!(sk, 32) and string!(m)
     CONTEXT.sign_schnorr(key_pair(sk), msg).serialized
   end
 
@@ -28,14 +37,7 @@ module SchnorrFast
   # Output
   #   Boolean, may raise SchnorrFast::Error
   def self.verify(pk, m, sig)
-    raise(TypeError, "pk: string") unless pk.is_a? String
-    raise(SizeError, "pk: 32 bytes") unless pk.bytesize == 32
-    raise(EncodingError, "pk: binary") unless pk.encoding == Encoding::BINARY
-    raise(TypeError, "m: string") unless m.is_a? String
-    raise(TypeError, "sig: string") unless sig.is_a? String
-    raise(SizeError, "sig: 64 bytes") unless sig.bytesize == 64
-    raise(EncodingError, "sig: binary") unless sig.encoding == Encoding::BINARY
-
+    bytestring!(pk, 32) and string!(m) and bytestring!(sig, 64)
     signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
   end
 
@@ -45,7 +47,7 @@ module SchnorrFast
   #   Secp256k1::KeyPair
   def self.key_pair(sk = nil)
     if sk
-      raise(TypeError, "sk: string") unless sk.is_a? String
+      bytestring!(sk, 32)
       CONTEXT.key_pair_from_private_key(sk)
     else
       CONTEXT.generate_key_pair
@@ -66,9 +68,7 @@ module SchnorrFast
   # Output
   #   Secp256k1::SchnorrSignature
   def self.signature(str)
-    raise(TypeError, "str: string") unless str.is_a? String
-    raise(SizeError, "str: 64 bytes") unless str.bytesize == 64
-    raise(EncodingError, "str: binary") unless str.encoding == Encoding::BINARY
+    bytestring!(str, 64)
     Secp256k1::SchnorrSignature.from_data(str)
   end
 end
