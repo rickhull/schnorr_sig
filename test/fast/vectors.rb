@@ -1,5 +1,4 @@
 require 'csv'
-require 'schnorr_sig'
 require 'schnorr_sig/fast'
 
 path = File.join(__dir__, '..', 'vectors.csv')
@@ -20,8 +19,8 @@ table.each { |row|
   expected = row.fetch('verification result') == 'TRUE'
 
   result = begin
-             SchnorrFast.verify(pk, m, sig)
-           rescue SchnorrFast::Error
+             SchnorrSig.verify(pk, m, sig)
+           rescue SchnorrSig::Error, SchnorrSig::InternalError
              false
            end
   (result == expected ? success : failure) << row

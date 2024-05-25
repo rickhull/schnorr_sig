@@ -1,5 +1,5 @@
 require 'csv'
-require 'schnorr_sig'
+require 'schnorr_sig/ruby'
 
 path = File.join(__dir__, 'vectors.csv')
 table = CSV.read(path, headers: true)
@@ -20,7 +20,7 @@ table.each { |row|
 
   result = begin
              SchnorrSig.verify(pk, m, sig)
-           rescue SchnorrSig::Error
+           rescue SchnorrSig::InternalError
              false
            end
   (result == expected ? success : failure) << row

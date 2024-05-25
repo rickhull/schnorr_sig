@@ -1,24 +1,9 @@
+require 'schnorr_sig'
 require 'rbsecp256k1'
 
-module SchnorrFast
+module SchnorrSig
   CONTEXT = Secp256k1::Context.create
-
   Error = Secp256k1::Error          # to enable: rescue SchnorrFast::Error
-  class TypeError < Error; end
-  class SizeError < Error; end
-  class EncodingError < Error; end
-
-  # true or raise
-  def self.string!(str)
-    str.is_a?(String) or raise(TypeError, str.class)
-  end
-
-  # true or raise
-  def self.bytestring!(str, size)
-    string!(str)
-    raise(EncodingError, str.encoding) unless str.encoding == Encoding::BINARY
-    str.size == size or raise(SizeError, str.size)
-  end
 
   # Input
   #   The secret key, sk: 32 bytes binary
