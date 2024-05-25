@@ -32,7 +32,7 @@ gem 'schnorr_sig'
 ## Usage
 
 ```
-require 'schnorr_sig'
+require 'schnorr_sig/ruby'
 
 msg = 'hello world'
 
