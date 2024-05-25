@@ -51,7 +51,7 @@ module SchnorrSig
   #   The message, m:           binary
   #   Auxiliary random data, a: 32 bytes binary
   # Output
-  #   The signature, sig:       64 bytres binary
+  #   The signature, sig:       64 bytes binary
   def self.sign(sk, m, a = Random.bytes(B))
     bytestring!(sk, B) and string!(m) and bytestring!(a, B)
 
@@ -117,8 +117,8 @@ module SchnorrSig
 
   # Input
   #   The public key, pk: 32 bytes binary
-  #   The message, m: binary
-  #   A signature, sig: 64 bytes binary
+  #   The message, m:     binary
+  #   A signature, sig:   64 bytes binary
   # Output
   #   Boolean
   def self.verify?(pk, m, sig)
