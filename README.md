@@ -15,6 +15,45 @@ and specifications similar to
 
 BIP340 specifies elliptic curve `secp256k1` for use with Schnorr signatures.
 
+## Approach
+
+There are two independent implementations, one aiming for as pure Ruby as
+possible, the other aiming for speed and correctness, relying on the
+battle-tested sep256k1 library used with Bitcoin.
+
+### Ruby Implementation
+
+This depends on the [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext)
+gem, which depends on the
+[ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/) gem,
+which implements the Elliptic Curve Digital Signature Algorithm (ECDSA)
+almost entirely in pure Ruby.  **ecdsa_ext** provides a computational
+speedup for points on elliptic curves by using projective (Jacobian) rather
+than affine coordinates.  Very little of the code in this library relies
+on these gems -- mainly for elliptical curve computations and the `secp256k1`
+curve definition.
+
+Most of the code in this library is based on implementing the pseudocode
+from [BIP340](https://bips.xyz/340).  i.e. A top-to-bottom implementation
+of most of the spec.  Enough to generate keypairs, signatures, and perform
+signature verification.  Extra care was taken to make the Ruby code match
+the pseudocode as close as feasible.  The pseudocode is commented
+[inline](lib/schnorr_sig/ruby.rb).
+
+### Fast Implementation
+
+This depends on the [rbsecp256k1](https://github.com/etscrivner/rbsecp256k1)
+gem, which is a C extension that wraps the battle-tested
+[secp256k1](https://github.com/bitcoin-core/secp256k1) library, also known
+as **libsecp256k1**.  There is much less code here, but the SchnorrSig module
+functions perform some input checking and match the function signatures from
+the Ruby implementation.  There are many advantages to using this
+implementation over the Ruby implementation, aside from efficiency,
+mostly having to with resistance to timing and side-channel attacks.
+
+The downside of using this implementation is a more difficult and involved
+install process, along with a certain level of inscrutability.
+
 ## Install
 
 Install locally:
@@ -27,6 +66,19 @@ Or add to your project `Gemfile`:
 
 ```
 gem 'schnorr_sig'
+```
+
+By default, only the dependencies for the Ruby implementation will be
+installed: **ecdsa_ext** gem and its dependencies.
+
+### Fast Implementation
+
+After installing the **schnorr_sig** gem, then install **rbsecp256k1**.
+Here's how I did it on NixOS:
+
+```
+nix-shell -p secp256k1 autoconf automake libtool
+gem install rbsecp256k1 -- --with-system-libraries
 ```
 
 ## Usage
@@ -44,4 +96,12 @@ sig = SchnorrSig.sign(sk, msg)
 
 # the signature has already been verified, but let's check
 SchnorrSig.verify(pk, msg, sig)  # => true
+```
+
+### Fast Implementation
+
+```
+require 'schnorr_sig/fast' # not 'schnorr_sig/ruby'
+
+# everything else as above ...
 ```
