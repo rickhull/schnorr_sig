@@ -204,6 +204,10 @@ module SchnorrSig
   # Input
   #   The secret key, sk: 32 bytes binary
   def self.pubkey(sk)
+    raise(TypeError, "sk: string") unless sk.is_a? String
+    raise(SizeError, "sk: 32 bytes") unless sk.bytesize == B
+    raise(EncodingError, "sk: binary") unless sk.encoding == Encoding::BINARY
+
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
     # BIP340: Return bytes(d' . G)
