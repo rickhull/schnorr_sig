@@ -62,6 +62,9 @@ end
 
 if __FILE__ == $0
   msg = 'hello world'
+
+  msg = msg.ljust(32, ' ')    # rbsecp256k1 requires 32-byte messages
+
   sk, pk = SchnorrSig.keypair
   puts "Message: #{msg}"
   puts "Secret key: #{SchnorrSig.bin2hex(sk)}"
