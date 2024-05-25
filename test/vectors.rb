@@ -4,7 +4,7 @@ case ENV['SCHNORR']
 when 'fast', 'FAST'
   require 'schnorr_sig/fast'
 else
-  require 'schnorr_sig/ruby'
+  require 'schnorr_sig'
 end
 
 path = File.join(__dir__, 'vectors.csv')
