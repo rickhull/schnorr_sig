@@ -36,7 +36,7 @@ curves by using projective (Jacobian) rather than affine coordinates.
 Very little of the code in this library relies on these gems -- mainly
 for elliptical curve computations and the `secp256k1` curve definition.
 
-Most of the code in this implemenation is based on directly on the pseudocode
+Most of the code in this implementaion is based directly on the pseudocode
 from [BIP340](https://bips.xyz/340).  i.e. A top-to-bottom implementation
 of most of the spec.  Enough to generate keypairs, signatures, and perform
 signature verification.  Extra care was taken to make the Ruby code match
