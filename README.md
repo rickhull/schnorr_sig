@@ -37,11 +37,11 @@ require 'schnorr_sig'
 msg = 'hello world'
 
 # generate secret key and public key
-sk, pk = Schnorr.keypair
+sk, pk = SchnorrSig.keypair
 
 # sign a message; exception raised on failure
-sig = Schnorr.sign(sk, msg)
+sig = SchnorrSig.sign(sk, msg)
 
 # the signature has already been verified, but let's check
-Schnorr.verify(pk, msg, sig)  # => true
+SchnorrSig.verify(pk, msg, sig)  # => true
 ```
