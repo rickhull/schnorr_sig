@@ -46,11 +46,12 @@ the pseudocode as close as feasible.  The pseudocode is commented
 This depends on the [rbsecp256k1](https://github.com/etscrivner/rbsecp256k1)
 gem, which is a C extension that wraps the battle-tested
 [secp256k1](https://github.com/bitcoin-core/secp256k1) library, also known
-as **libsecp256k1**.  There is much less code here, but the SchnorrSig module
-functions perform some input checking and match the function signatures from
-the Ruby implementation.  There are many advantages to using this
-implementation over the Ruby implementation, aside from efficiency,
-mostly having to with resistance to timing and side-channel attacks.
+as **libsecp256k1**.  There is much less code here, but the `SchnorrSig`
+module functions perform some input checking and match the function
+signatures from the Ruby implementation.  There are many advantages to
+using this implementation over the Ruby implementation, aside from
+efficiency, mostly having to with resistance to timing and side-channel
+attacks.
 
 The downside of using this implementation is a more difficult and involved
 install process, along with a certain level of inscrutability.
@@ -84,7 +85,7 @@ gem install rbsecp256k1 -- --with-system-libraries
 
 ## Usage
 
-```
+```ruby
 require 'schnorr_sig/ruby'
 
 msg = 'hello world'
@@ -101,7 +102,7 @@ SchnorrSig.verify(pk, msg, sig)  # => true
 
 ### Fast Implementation
 
-```
+```ruby
 require 'schnorr_sig/fast' # not 'schnorr_sig/ruby'
 
 # everything else as above ...
