@@ -24,27 +24,36 @@ provided by the Bitcoin project.
 
 ### Ruby Implementation
 
-This depends on the [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext)
-gem, which depends on the
-[ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/) gem,
+This is the default implementation and the only implementation for which
+this gem specifies its dependencies:
+the [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext) gem, which depends
+on the [ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/) gem,
 which implements the Elliptic Curve Digital Signature Algorithm (ECDSA)
-almost entirely in pure Ruby.  **ecdsa_ext** provides a computational
-speedup for points on elliptic curves by using projective (Jacobian) rather
-than affine coordinates.  Very little of the code in this library relies
-on these gems -- mainly for elliptical curve computations and the `secp256k1`
-curve definition.
+almost entirely in pure Ruby.
 
-Most of the code in this library is based on implementing the pseudocode
+**ecdsa_ext** provides computational efficiency for points on elliptic
+curves by using projective (Jacobian) rather than affine coordinates.
+Very little of the code in this library relies on these gems -- mainly
+for elliptical curve computations and the `secp256k1` curve definition.
+
+Most of the code in this implemenation is based on directly on the pseudocode
 from [BIP340](https://bips.xyz/340).  i.e. A top-to-bottom implementation
 of most of the spec.  Enough to generate keypairs, signatures, and perform
 signature verification.  Extra care was taken to make the Ruby code match
 the pseudocode as close as feasible.  The pseudocode is commented
 [inline](lib/schnorr_sig/ruby.rb#L55).
 
+A lot of care was taken to keep conversions and checks to a minimum.  The
+functions are very strict about what they accept and attempt to be as fast
+as possible, while remaining expressive.  This implementation should
+outperform [bip-schnorrb](https://github.com/chaintope/bip-schnorrrb)
+in speed, simplicity, and expressiveness.
+
 ### Fast Implementation
 
-This depends on the [rbsecp256k1](https://github.com/etscrivner/rbsecp256k1)
-gem, which is a C extension that wraps the battle-tested
+This implementation depends on the
+[rbsecp256k1](https://github.com/etscrivner/rbsecp256k1) gem, which is a
+C extension that wraps the
 [secp256k1](https://github.com/bitcoin-core/secp256k1) library, also known
 as **libsecp256k1**.  There is much less code here, but the `SchnorrSig`
 module functions perform some input checking and match the function
@@ -86,7 +95,7 @@ gem install rbsecp256k1 -- --with-system-libraries
 ## Usage
 
 ```ruby
-require 'schnorr_sig/ruby'
+require 'schnorr_sig'
 
 msg = 'hello world'
 
@@ -103,7 +112,7 @@ SchnorrSig.verify?(pk, msg, sig)  # => true
 ### Fast Implementation
 
 ```ruby
-require 'schnorr_sig/fast' # not 'schnorr_sig/ruby'
+require 'schnorr_sig/fast' # not 'schnorr_sig'
 
 # everything else as above ...
 ```
