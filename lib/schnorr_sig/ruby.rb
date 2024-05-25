@@ -3,6 +3,7 @@ require 'ecdsa_ext'                    # gem
 autoload :SecureRandom, 'securerandom' # stdlib
 
 # This implementation is based on the BIP340 spec: https://bips.xyz/340
+# re-open SchnorrSig to add more functions, errors, and constants
 module SchnorrSig
   class Error < RuntimeError; end
   class BoundsError < Error; end
@@ -49,7 +50,8 @@ module SchnorrSig
   #   The secret key, sk:       32 bytes binary
   #   The message, m:           binary
   #   Auxiliary random data, a: 32 bytes binary
-  # Note: this deals with N (the order) and not P (the prime)
+  # Output
+  #   The signature, sig:       64 bytres binary
   def self.sign(sk, m, a = Random.bytes(B))
     bytestring!(sk, B) and string!(m) and bytestring!(a, B)
 
@@ -91,11 +93,16 @@ module SchnorrSig
     # BIP340: Fail unless Verify(bytes(P), m, sig)
     # BIP340: Return the signature sig
     sig = bytes_r + bytes((k + e * d) % N)
-    raise(VerifyFail) unless verify(bytes_p, m, sig)
+    raise(VerifyFail) unless verify?(bytes_p, m, sig)
     sig
   end
 
   # see https://bips.xyz/340#design (Tagged hashes)
+  # Input
+  #   A tag, tag:       UTF-8 or binary
+  #   The payload, msg: UTF-8 or binary
+  # Output
+  #   32 bytes binary
   def self.tagged_hash(tag, msg)
     string!(tag) and string!(msg)
     warn("tag expected to be UTF-8") unless tag.encoding == Encoding::UTF_8
@@ -112,7 +119,9 @@ module SchnorrSig
   #   The public key, pk: 32 bytes binary
   #   The message, m: binary
   #   A signature, sig: 64 bytes binary
-  def self.verify(pk, m, sig)
+  # Output
+  #   Boolean
+  def self.verify?(pk, m, sig)
     bytestring!(pk, B) and string!(m) and bytestring!(sig, B * 2)
 
     # BIP340: Let P = lift_x(int(pk))
@@ -143,7 +152,10 @@ module SchnorrSig
   # BIP340: The function lift_x(x), where x is a 256-bit unsigned integer,
   #         returns the point P for which x(P) = x[10] and has_even_y(P),
   #         or fails if x is greater than p-1 or no such point exists.
-  # Note: this deals with P (the prime) and not N (the order)
+  # Input
+  #   A large integer, x
+  # Output
+  #   ECDSA::Point
   def self.lift_x(x)
     integer!(x)
 
@@ -167,6 +179,8 @@ module SchnorrSig
 
   # Input
   #   The secret key, sk: 32 bytes binary
+  # Output
+  #   32 bytes binary (represents P.x for point P on the curve)
   def self.pubkey(sk)
     bytestring!(sk, B)
 

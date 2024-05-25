@@ -97,7 +97,7 @@ sk, pk = SchnorrSig.keypair
 sig = SchnorrSig.sign(sk, msg)
 
 # the signature has already been verified, but let's check
-SchnorrSig.verify(pk, msg, sig)  # => true
+SchnorrSig.verify?(pk, msg, sig)  # => true
 ```
 
 ### Fast Implementation

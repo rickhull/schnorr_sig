@@ -1,9 +1,10 @@
 require 'schnorr_sig'
-require 'rbsecp256k1'
+require 'rbsecp256k1' # gem, C extension
 
+# re-open SchnorrSig to add more functions, errors, and constants
 module SchnorrSig
   CONTEXT = Secp256k1::Context.create
-  Error = Secp256k1::Error          # to enable: rescue SchnorrFast::Error
+  Error = Secp256k1::Error # enable: rescue SchnorrSig::Error
 
   # Input
   #   The secret key, sk: 32 bytes binary
@@ -20,8 +21,8 @@ module SchnorrSig
   #   The message, m:     binary
   #   A signature, sig:   64 bytes binary
   # Output
-  #   Boolean, may raise SchnorrFast::Error
-  def self.verify(pk, m, sig)
+  #   Boolean, may raise SchnorrSig::Error
+  def self.verify?(pk, m, sig)
     bytestring!(pk, 32) and string!(m) and bytestring!(sig, 64)
     signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
   end

@@ -25,7 +25,7 @@ table.each { |row|
   expected = row.fetch('verification result') == 'TRUE'
 
   result = begin
-             SchnorrSig.verify(pk, m, sig)
+             SchnorrSig.verify?(pk, m, sig)
            rescue SchnorrSig::Error
              false
            end
