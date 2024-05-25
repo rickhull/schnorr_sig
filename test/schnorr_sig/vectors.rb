@@ -8,20 +8,11 @@ success = []
 failure = []
 
 table.each { |row|
-  # index
-  # secret key
-  # public key
-  # aux_rand
-  # message
-  # signature
-  # verification result
-  # comment
-
-  sk       = Schnorr.hex2bin row.fetch('secret key')
-  pk       = Schnorr.hex2bin row.fetch('public key')
-  aux_rand = Schnorr.hex2bin row.fetch('aux_rand')
-  m        = Schnorr.hex2bin row.fetch('message')
-  sig      = Schnorr.hex2bin row.fetch('signature')
+  sk       = SchnorrSig.hex2bin row.fetch('secret key')
+  pk       = SchnorrSig.hex2bin row.fetch('public key')
+  aux_rand = SchnorrSig.hex2bin row.fetch('aux_rand')
+  m        = SchnorrSig.hex2bin row.fetch('message')
+  sig      = SchnorrSig.hex2bin row.fetch('signature')
 
   index    = row.fetch('index')
   comment  = row.fetch('comment')
@@ -49,5 +40,7 @@ puts
 
 puts "Success: #{success.count}"
 puts "Failure: #{failure.count}"
+
+puts failure unless failure.empty?
 
 exit failure.count

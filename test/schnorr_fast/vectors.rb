@@ -12,15 +12,6 @@ def hex2bin(hex)
 end
 
 table.each { |row|
-  # index
-  # secret key
-  # public key
-  # aux_rand
-  # message
-  # signature
-  # verification result
-  # comment
-
   sk       = hex2bin row.fetch('secret key')
   pk       = hex2bin row.fetch('public key')
   aux_rand = hex2bin row.fetch('aux_rand')
@@ -42,5 +33,7 @@ puts
 
 puts "Success: #{success.count}"
 puts "Failure: #{failure.count}"
+
+puts failure unless failure.empty?
 
 exit failure.count

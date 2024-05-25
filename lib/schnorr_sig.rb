@@ -2,7 +2,7 @@ require 'ecdsa_ext'
 autoload :SecureRandom, 'securerandom'
 
 # This implementation is based on the spec: https://bips.xyz/340
-module Schnorr
+module SchnorrSig
   class Error < RuntimeError; end
   class BoundsError < Error; end
   class SizeError < Error; end
@@ -230,13 +230,13 @@ end
 
 if __FILE__ == $0
   msg = 'hello world'
-  sk, pk = Schnorr.keypair
+  sk, pk = SchnorrSig.keypair
   puts "Message: #{msg}"
-  puts "Secret key: #{Schnorr.bin2hex(sk)}"
+  puts "Secret key: #{SchnorrSig.bin2hex(sk)}"
 
-  sig = Schnorr.sign(sk, msg)
+  sig = SchnorrSig.sign(sk, msg)
   puts
-  puts "Verified signature: #{Schnorr.bin2hex(sig)}"
+  puts "Verified signature: #{SchnorrSig.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
 end
