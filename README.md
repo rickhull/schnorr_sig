@@ -39,7 +39,7 @@ from [BIP340](https://bips.xyz/340).  i.e. A top-to-bottom implementation
 of most of the spec.  Enough to generate keypairs, signatures, and perform
 signature verification.  Extra care was taken to make the Ruby code match
 the pseudocode as close as feasible.  The pseudocode is commented
-[inline](lib/schnorr_sig/ruby.rb).
+[inline](lib/schnorr_sig/ruby.rb#L55).
 
 ### Fast Implementation
 
