@@ -242,6 +242,7 @@ required.
 * For any given x-value on the curve, the y-value is easily generated
 * For most curves, there are two different y-values for an x-value
 * We are always dealing with 32-byte integers: **Bignums**
+* Bignum math can be expensive
 * Converting between integer format and 32-byte strings can be expensive
 * The Schnorr algorithm requires lots of `string <--> integer` conversion
 * Hex strings are never used internally
