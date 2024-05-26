@@ -14,6 +14,68 @@ and specifications similar to
 [IETF RFCs](https://en.wikipedia.org/wiki/Request_for_Comments).
 BIP340 specifies elliptic curve `secp256k1` for use with Schnorr signatures.
 
+# Usage
+
+This library is provided as a RubyGem.  It has a single dependency on
+[ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext), with a
+corresponding transitive dependency on
+[ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/).
+
+## Install
+
+Install locally:
+
+```
+$ gem install schnorr_sig
+```
+
+Or add to your project `Gemfile`:
+
+```
+gem 'schnorr_sig'
+```
+
+By default, only the dependencies for the Ruby implementation will be
+installed: **ecdsa_ext** gem and its dependencies.
+
+### Fast Implementation
+
+After installing the **schnorr_sig** gem, then install
+[rbsecp256k1](https://github.com/etscrivner/rbsecp256k1).
+Here's how I did it on NixOS:
+
+```
+nix-shell -p secp256k1 autoconf automake libtool
+gem install rbsecp256k1 -- --with-system-libraries
+```
+
+## Example
+
+```ruby
+require 'schnorr_sig'
+
+msg = 'hello world'
+
+# generate secret key and public key
+sk, pk = SchnorrSig.keypair
+
+# sign a message; exception raised on failure
+sig = SchnorrSig.sign(sk, msg)
+
+# the signature has already been verified, but let's check
+SchnorrSig.verify?(pk, msg, sig)  # => true
+```
+
+### Fast Implementation
+
+```ruby
+require 'schnorr_sig/fast' # not 'schnorr_sig'
+
+# everything else as above ...
+```
+
+# Background
+
 ## Elliptic Curves
 
 Note that [elliptic curves](https://en.wikipedia.org/wiki/Elliptic_curve)
@@ -222,63 +284,3 @@ Currently, **rbsecp256k1** restricts messages to exactly 32 bytes, which
 was part of the BIPS340 spec until April 2023, when the restriction was lifted.
 
 See https://github.com/etscrivner/rbsecp256k1/issues/80
-
-# Usage
-
-This library is provided as a RubyGem.  It has a single dependency on
-[ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext), with a
-corresponding transitive dependency on
-[ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/).
-
-## Install
-
-Install locally:
-
-```
-$ gem install schnorr_sig
-```
-
-Or add to your project `Gemfile`:
-
-```
-gem 'schnorr_sig'
-```
-
-By default, only the dependencies for the Ruby implementation will be
-installed: **ecdsa_ext** gem and its dependencies.
-
-### Fast Implementation
-
-After installing the **schnorr_sig** gem, then install
-[rbsecp256k1](https://github.com/etscrivner/rbsecp256k1).
-Here's how I did it on NixOS:
-
-```
-nix-shell -p secp256k1 autoconf automake libtool
-gem install rbsecp256k1 -- --with-system-libraries
-```
-
-## Example
-
-```ruby
-require 'schnorr_sig'
-
-msg = 'hello world'
-
-# generate secret key and public key
-sk, pk = SchnorrSig.keypair
-
-# sign a message; exception raised on failure
-sig = SchnorrSig.sign(sk, msg)
-
-# the signature has already been verified, but let's check
-SchnorrSig.verify?(pk, msg, sig)  # => true
-```
-
-### Fast Implementation
-
-```ruby
-require 'schnorr_sig/fast' # not 'schnorr_sig'
-
-# everything else as above ...
-```
