@@ -42,10 +42,10 @@ x-value with a little bit of algebra: `y = sign(x) * sqrt(x^3 + ax + b)`.
 
 ## Bignums
 
-We can conjure into existence a gigantic 32-byte integer.  Note that until
-recently, most consumer CPUs could only handle 32-bit integers.  A 32-byte
-integer is 8x larger than common hardware integers, so math on large integers
-must be done in software.
+We can conjure into existence a gigantic *32-byte* integer. Until recently,
+most consumer CPUs could only handle *32-bit* integers.  A 32-byte integer
+is 8x larger than common hardware integers, so math on large integers must
+be done in software.
 
 In Ruby, you can get a 32-byte value with: `Random.bytes(32)`, which will
 return a 32-byte binary string.  There are several ways to convert this to
