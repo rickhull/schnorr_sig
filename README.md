@@ -14,12 +14,31 @@ and specifications similar to
 [IETF RFCs](https://en.wikipedia.org/wiki/Request_for_Comments).
 BIP340 specifies elliptic curve `secp256k1` for use with Schnorr signatures.
 
-Note that elliptic curves are not ellipses, but instead cubic equations of
+## Elliptic Curves
+
+Note that [elliptic curves](https://en.wikipedia.org/wiki/Elliptic_curve)
+are not ellipses, but can instead be described by cubic equations of
 the form: `y^2 = x^3 + ax + b` where `a` and `b` are the parameters of the
 resulting curve.  All points (x, y) which satisfy a given parameterized
 equation provide the exact definition of an elliptic curve.
 
 `secp256k1` uses `a = 0` and `b = 7`, so `y^2 = x^3 + 7`
+
+Elliptic curves have an algebraic structure which involve mathematical
+structures like Groups and Fields, and prime numbers are useful.  I won't
+elaborate further here, as I am still learning in this area.
+
+## Generator Point
+
+Every elliptic curve has an *infinity point*, and one step away from the
+infinity point is a so-called *generator point*, `G`.  Add `G` to the infinity
+point; the result is `G`.  Add `G` again, and the result is `2G`.  Where `N`
+is the *order* of the curve, `NG` returns to the infinity point.
+
+You can multiply `G` by any integer < `N` to get a corresponding point on
+the curve. So `G` is a point, a pair of large integers, `(x, y)`.  `G` can
+be compressed to just the x-value, as the y-value can be derived from the
+x-value with a little bit of algebra: `y = sign(x) * sqrt(x^3 + ax + b)`.
 
 ## Approach
 
