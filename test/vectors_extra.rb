@@ -5,13 +5,10 @@ require 'csv'
 path = File.join(__dir__, 'vectors.csv')
 table = CSV.read(path, headers: true)
 
-success = []
-failure = []
-
 table.each { |row|
   sk       = SchnorrSig.hex2bin row.fetch('secret key')
   pk       = SchnorrSig.hex2bin row.fetch('public key')
-  aux_rand = SchnorrSig.hex2bin row.fetch('aux_rand')
+  #aux_rand = SchnorrSig.hex2bin row.fetch('aux_rand')
   m        = SchnorrSig.hex2bin row.fetch('message')
   sig      = SchnorrSig.hex2bin row.fetch('signature')
 
@@ -42,6 +39,6 @@ table.each { |row|
              false
            end
   verify_msg = (result == expected) ? "verify match" : "verify mismatch"
-  puts [index, pk_msg, sig_msg, verify_msg].join("\t")
+  puts [index, pk_msg, sig_msg, verify_msg, comment].join("\t")
 }
 puts
