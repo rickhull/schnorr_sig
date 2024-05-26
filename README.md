@@ -104,11 +104,11 @@ Here is one
 }
 ```
 
-* `p` is the prime for the Field, below INTMAX(32) (256^32)
+* `p` is the prime for the Field, below `INTMAX(32)` (256^32)
 * `a` is zero, as above
 * `b` is seven, as above
-* `g` is the generator point: [x, y]
-* `n` is the Group order, significantly below INTMAX(32)
+* `g` is the generator point: `[x, y]`
+* `n` is the Group order, significantly below `INTMAX(32)`
 
 Elliptic curves have algebraic structures called
 [Groups](https://en.wikipedia.org/wiki/Group_\(mathematics\)) and
