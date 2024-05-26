@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.description = "Pure ruby based on ECDSA gem; separate libsecp256k1 impl"
   s.authors = ["Rick Hull"]
   s.homepage = "https://github.com/rickhull/schnorr_sig"
-  s.license = "LGPL-3.0"
+  s.license = "LGPL-2.1-only"
 
   s.required_ruby_version = "~> 3.0"
 
