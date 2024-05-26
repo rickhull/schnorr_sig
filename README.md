@@ -222,7 +222,8 @@ installed: **ecdsa_ext** gem and its dependencies.
 
 ### Fast Implementation
 
-After installing the **schnorr_sig** gem, then install **rbsecp256k1**.
+After installing the **schnorr_sig** gem, then install
+[rbsecp256k1](https://github.com/etscrivner/rbsecp256k1).
 Here's how I did it on NixOS:
 
 ```
