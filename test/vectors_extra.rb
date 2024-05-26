@@ -1,11 +1,6 @@
+require ENV['SCHNORR_SIG']&.downcase == 'fast' ?
+          'schnorr_sig/fast' : 'schnorr_sig'
 require 'csv'
-
-case ENV['SCHNORR']
-when 'fast', 'FAST'
-  require 'schnorr_sig/fast'
-else
-  require 'schnorr_sig'
-end
 
 path = File.join(__dir__, 'vectors.csv')
 table = CSV.read(path, headers: true)
