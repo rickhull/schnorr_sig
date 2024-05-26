@@ -24,6 +24,8 @@ equation provide the exact definition of an elliptic curve.
 
 `secp256k1` uses `a = 0` and `b = 7`, so `y^2 = x^3 + 7`
 
+![secp256k1: y^2 = x^3 + 7](assets/secp256k1.png)
+
 Elliptic curves have an algebraic structure which involve mathematical
 structures like Groups and Fields, and prime numbers are useful.  I won't
 elaborate further here, as I am still learning in this area.
