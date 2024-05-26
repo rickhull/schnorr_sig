@@ -94,6 +94,8 @@ Elliptic curves have algebraic structures called
 and prime numbers are useful.  I won't elaborate further here, as I am
 still learning in this area and reluctant to publish misunderstandings.
 
+## Curve `secp256k1`
+
 Here is one
 [minimal definition of `secp256k1`](https://github.com/DavidEGrayson/ruby_ecdsa/blob/master/lib/ecdsa/group/secp256k1.rb):
 
