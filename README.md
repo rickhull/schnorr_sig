@@ -95,9 +95,9 @@ require 'schnorr_sig/fast' # not 'schnorr_sig'
 # Elliptic Curves
 
 Note that [elliptic curves](https://en.wikipedia.org/wiki/Elliptic_curve)
-are not ellipses, but can instead be described by cubic equations of
+are not ellipses, but are instead described by cubic equations of
 the form: `y^2 = x^3 + ax + b` where `a` and `b` are the parameters of the
-resulting curve.  All points `(x, y)` which satisfy a given parameterized
+resulting equation.  All points `(x, y)` which satisfy a given parameterized
 equation provide the exact definition of an elliptic curve.
 
 ## Curve `secp256k1`
