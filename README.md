@@ -40,6 +40,39 @@ the curve. So `G` is a point, a pair of large integers, `(x, y)`.  `G` can
 be compressed to just the x-value, as the y-value can be derived from the
 x-value with a little bit of algebra: `y = sign(x) * sqrt(x^3 + ax + b)`.
 
+## Bignums
+
+We can conjure into existence a gigantic 32-byte integer.  Note that until
+recently, most consumer CPUs could only handle 32-bit integers.  A 32-byte
+integer is 8x larger than common hardware integers, so math on large integers
+must be done in software.
+
+In Ruby, you can get a 32-byte value with: `Random.bytes(32)`, which will
+return a 32-byte binary string.  There are several ways to convert this to
+an integer value, which in Ruby is called a **Bignum** when it exceeds
+the highest value for a **Fixnum**, which corresponds to a hardware integer.
+It's important to realize that: "Fixnums are fast; Bignums are slow".
+
+## Keypairs
+
+Let's conjure into existence a gigantic 32-byte integer:
+
+```
+sk = Random.bytes(32)     # a binary string, length 32
+hex = sk.to_s(16)         # convert to a hex string like: "199ace9bc1 ..."
+bignum = [hex].pack('H*') # convert to a binary string like: "\x19\x9a ..."
+```
+
+`bignum` is the integer value of our private key, randomly generated.
+We can multiply it by `G` to get a corresponding point on the elliptic curve,
+`P`.  `P.x` is now our public key, the x-value of a point on the curve.
+
+Keep in mind:
+
+* For any given secret key (32 byte value), a public key is easily generated
+* For any given x-value on the curve, the y-value is easily generated
+* For some curves, there can be two different y-values for an x-value
+
 # Implementation
 
 There are two independent implementations, one aiming for as pure Ruby as
