@@ -42,18 +42,17 @@ Here is one
   a: 0,
   b: 7,
   g: [0x79BE667E_F9DCBBAC_55A06295_CE870B07_029BFCDB_2DCE28D9_59F2815B_16F81798,
-  0x483ADA77_26A3C465_5DA4FBFC_0E1108A8_FD17B448_A6855419_9C47D08F_FB10D4B8],
+      0x483ADA77_26A3C465_5DA4FBFC_0E1108A8_FD17B448_A6855419_9C47D08F_FB10D4B8],
   n: 0xFFFFFFFF_FFFFFFFF_FFFFFFFF_FFFFFFFE_BAAEDCE6_AF48A03B_BFD25E8C_D0364141,
   h: 1,
 }
 ```
 
-* `p` is the Group order, not quite the maximal 32-byte integer (256^32)
+* `p` is the prime for the Field, below INTMAX(32) (256^32)
 * `a` is zero, as above
 * `b` is seven, as above
 * `g` is the generator point: [x, y]
-* `n` is the prime for the Field, smaller than `p`
-* `h` not sure
+* `n` is the Group order, significantly below INTMAX(32)
 
 ## Generator Point
 
