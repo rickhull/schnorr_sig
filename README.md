@@ -56,7 +56,7 @@ Takeaway: *Fixnums are fast; Bignums are slow*
 
 ## Keypairs
 
-Let's conjure into existence a gigantic 32-byte integer, sk (secret key):
+Let's conjure into existence a gigantic 32-byte integer, `sk` (secret key):
 
 ```
 sk = Random.bytes(32)     # a binary string, length 32
@@ -67,7 +67,8 @@ bignum = hex.to_i(16)     # convert hex to integer, possibly a bignum
 `sk` is now our 32-byte secret key, and `bignum` is the integer value of `sk`.
 We can multiply `bignum` by `G` to get a corresponding point on the
 elliptic curve, `P`.  `P.x` is now our public key, the x-value of a point on
-the curve.
+the curve.  Technically, we would want to convert the large integer `P.x`
+to a binary string in order to make it a peer with `sk`.
 
 ## Takeaways
 
