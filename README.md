@@ -27,9 +27,10 @@ with mostly-Ruby dependencies:
 ## "Fast" Implementation
 
 This is based on the [rbsecp256k1](https://github.com/etscrivner/rbsecp256k1)
-gem, which is not installed by default.  The gem wraps the **secp256k1**
-library from the Bitcoin project, which provides battle-tested performance
-and correctness and security guarantees.
+gem, which is not installed by default.  The gem wraps the
+[secp256k1](https://github.com/bitcoin-core/secp256k1) library from the
+Bitcoin project, which provides battle-tested performance, correctness, and
+security guarantees.
 
 # Usage
 
