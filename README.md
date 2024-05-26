@@ -56,7 +56,7 @@ Takeaway: *Fixnums are fast; Bignums are slow*
 
 ## Keypairs
 
-Let's conjure into existence a gigantic 32-byte integer:
+Let's conjure into existence a gigantic 32-byte integer, sk (secret key):
 
 ```
 sk = Random.bytes(32)     # a binary string, length 32
@@ -64,15 +64,19 @@ hex = [str].pack('H*')    # convert to a hex string like: "199ace9bc1 ..."
 bignum = hex.to_i(16)     # convert hex to integer, possibly a bignum
 ```
 
-`bignum` is the integer value of our private key, randomly generated.
-We can multiply it by `G` to get a corresponding point on the elliptic curve,
-`P`.  `P.x` is now our public key, the x-value of a point on the curve.
+`sk` is now our 32-byte secret key, and `bignum` is the integer value of `sk`.
+We can multiply `bignum` by `G` to get a corresponding point on the
+elliptic curve, `P`.  `P.x` is now our public key, the x-value of a point on
+the curve.
 
-Keep in mind:
+## Takeaways
 
 * For any given secret key (32 byte value), a public key is easily generated
 * For any given x-value on the curve, the y-value is easily generated
 * For some curves, there can be two different y-values for an x-value
+* We are always dealing with 32-byte integers: **Bignums**
+* Converting between integer format and 32-byte strings can be expensive
+* The Schnorr algorithm requires lots of `string <--> integer` conversion
 
 # Implementation
 
