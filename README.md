@@ -52,7 +52,7 @@ return a 32-byte binary string.  There are several ways to convert this to
 an integer value, which in Ruby is called a **Bignum** when it exceeds
 the highest value for a **Fixnum**, which corresponds to a hardware integer.
 
-Takeaway: *Fixnums are fast; Bignums are slow*
+*Fixnums are fast; Bignums are slow*
 
 ## Keypairs
 
@@ -64,11 +64,59 @@ hex = [str].pack('H*')    # convert to a hex string like: "199ace9bc1 ..."
 bignum = hex.to_i(16)     # convert hex to integer, possibly a bignum
 ```
 
-`sk` is now our 32-byte secret key, and `bignum` is the integer value of `sk`.
-We can multiply `bignum` by `G` to get a corresponding point on the
-elliptic curve, `P`.  `P.x` is now our public key, the x-value of a point on
+`sk` is now our 32-byte **secret key**, and `bignum` is the integer value
+of `sk`.  We can multiply `bignum` by `G` to get a corresponding point on
+the elliptic curve, `P`.
+
+`P.x` is now our **public key**, the x-value of a point on
 the curve.  Technically, we would want to convert the large integer `P.x`
 to a binary string in order to make it a peer with `sk`.
+
+## Formatting
+
+* Binary String
+* Integer
+* Hexadecimal String
+
+Our baseline format is the binary string:
+
+```
+'asdf'.encoding   # => #<Encoding:UTF-8>
+'asdf'.b          # => "asdf"
+'asdf'.b.encoding # => #<Encoding:ASCII-8BIT>
+Encoding::BINARY  # => #<Encoding:ASCII-8BIT>
+"\x00".encoding   # => #<Encoding:UTF-8>
+"\xFF".encoding   # => #<Encoding:UTF-8>
+```
+
+Default encoding for Ruby's `String` is `UTF-8`.  This encoding can be used
+for messages and tags in BIP340.  Call `String#b` to return
+a new string with the same value, but with `BINARY` encoding.  Note that
+Ruby still calls `BINARY` encoding `ASCII-8BIT`, but this may change, and
+`BINARY` is preferred.  Anywhere you might say `ASCII-8BIT` you can say
+`BINARY` instead.
+
+Any `UTF-8` strings will never be converted to integers.  `UTF-8` strings tend
+to be unrestricted or undeclared in size.  So let's turn to the `BINARY`
+strings.
+
+`BINARY` strings will tend to have a known, fixed size (almost certainly 32),
+and they can be expected to be converted to integers, likely Bignums.
+
+Hexadecimal strings (aka "hex") are like `"deadbeef0123456789abcdef00ff00ff".
+These are never used internally, but they are typically used at the user
+interface layer, as binary strings are not handled well by most user
+interfaces.
+
+Any Schnorr Signature implementation must be able to efficiently convert:
+
+* binary to bignum
+* bignum to binary
+* binary to hex
+* hex to binary
+
+Note that "bignum to hex" can be handled transitively and is typically not
+required.
 
 ## Takeaways
 
@@ -78,6 +126,8 @@ to a binary string in order to make it a peer with `sk`.
 * We are always dealing with 32-byte integers: **Bignums**
 * Converting between integer format and 32-byte strings can be expensive
 * The Schnorr algorithm requires lots of `string <--> integer` conversion
+* Hex strings are never used internally
+* Provide efficient, obvious routines for the fundamental conversions
 
 # Implementation
 
