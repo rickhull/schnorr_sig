@@ -42,8 +42,6 @@ x-value with a little bit of algebra: `y = sign(x) * sqrt(x^3 + ax + b)`.
 
 # Implementation
 
-## Approach
-
 There are two independent implementations, one aiming for as pure Ruby as
 possible, the other aiming for speed and correctness, relying on the
 battle-tested [sep256k1 library](https://github.com/bitcoin-core/secp256k1)
@@ -100,6 +98,11 @@ was part of the BIPS340 spec until April 2023, when the restriction was lifted.
 See https://github.com/etscrivner/rbsecp256k1/issues/80
 
 # Usage
+
+This library is provided as a RubyGem.  It has a single dependency on
+[ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext), with a
+corresponding transitive dependency on
+[ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/).
 
 ## Install
 
