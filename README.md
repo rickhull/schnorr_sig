@@ -51,7 +51,8 @@ In Ruby, you can get a 32-byte value with: `Random.bytes(32)`, which will
 return a 32-byte binary string.  There are several ways to convert this to
 an integer value, which in Ruby is called a **Bignum** when it exceeds
 the highest value for a **Fixnum**, which corresponds to a hardware integer.
-It's important to realize that: "Fixnums are fast; Bignums are slow".
+
+Takeaway: *Fixnums are fast; Bignums are slow*
 
 ## Keypairs
 
