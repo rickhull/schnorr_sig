@@ -40,6 +40,8 @@ the curve. So `G` is a point, a pair of large integers, `(x, y)`.  `G` can
 be compressed to just the x-value, as the y-value can be derived from the
 x-value with a little bit of algebra: `y = sign(x) * sqrt(x^3 + ax + b)`.
 
+# Implementation
+
 ## Approach
 
 There are two independent implementations, one aiming for as pure Ruby as
@@ -47,7 +49,7 @@ possible, the other aiming for speed and correctness, relying on the
 battle-tested [sep256k1 library](https://github.com/bitcoin-core/secp256k1)
 provided by the Bitcoin project.
 
-### Ruby Implementation
+## Ruby Implementation
 
 This is the default implementation and the only implementation for which
 this gem specifies its dependencies:
@@ -74,7 +76,7 @@ as possible, while remaining expressive.  This implementation should
 outperform [bip-schnorrb](https://github.com/chaintope/bip-schnorrrb)
 in speed, simplicity, and expressiveness.
 
-### Fast Implementation
+## Fast Implementation
 
 This implementation depends on the
 [rbsecp256k1](https://github.com/etscrivner/rbsecp256k1) gem, which is a
@@ -90,12 +92,14 @@ attacks.
 The downside of using this implementation is a more difficult and involved
 install process, along with a certain level of inscrutability.
 
-#### Temporary Restriction
+### Temporary Restriction
 
 Currently, **rbsecp256k1** restricts messages to exactly 32 bytes, which
 was part of the BIPS340 spec until April 2023, when the restriction was lifted.
 
 See https://github.com/etscrivner/rbsecp256k1/issues/80
+
+# Usage
 
 ## Install
 
@@ -124,7 +128,7 @@ nix-shell -p secp256k1 autoconf automake libtool
 gem install rbsecp256k1 -- --with-system-libraries
 ```
 
-## Usage
+## Example
 
 ```ruby
 require 'schnorr_sig'
