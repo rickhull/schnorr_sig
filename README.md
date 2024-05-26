@@ -74,27 +74,19 @@ require 'schnorr_sig/fast' # not 'schnorr_sig'
 # everything else as above ...
 ```
 
-# Background
-
-## Elliptic Curves
+# Elliptic Curves
 
 Note that [elliptic curves](https://en.wikipedia.org/wiki/Elliptic_curve)
 are not ellipses, but can instead be described by cubic equations of
 the form: `y^2 = x^3 + ax + b` where `a` and `b` are the parameters of the
-resulting curve.  All points (x, y) which satisfy a given parameterized
+resulting curve.  All points `(x, y)` which satisfy a given parameterized
 equation provide the exact definition of an elliptic curve.
+
+## Curve `secp256k1`
 
 `secp256k1` uses `a = 0` and `b = 7`, so `y^2 = x^3 + 7`
 
 ![secp256k1: y^2 = x^3 + 7](assets/secp256k1.png)
-
-Elliptic curves have algebraic structures called
-[Groups](https://en.wikipedia.org/wiki/Group_\(mathematics\)) and
-[Fields](https://en.wikipedia.org/wiki/Field_\(mathematics\)),
-and prime numbers are useful.  I won't elaborate further here, as I am
-still learning in this area and reluctant to publish misunderstandings.
-
-## Curve `secp256k1`
 
 Here is one
 [minimal definition of `secp256k1`](https://github.com/DavidEGrayson/ruby_ecdsa/blob/master/lib/ecdsa/group/secp256k1.rb):
@@ -117,6 +109,12 @@ Here is one
 * `b` is seven, as above
 * `g` is the generator point: [x, y]
 * `n` is the Group order, significantly below INTMAX(32)
+
+Elliptic curves have algebraic structures called
+[Groups](https://en.wikipedia.org/wiki/Group_\(mathematics\)) and
+[Fields](https://en.wikipedia.org/wiki/Field_\(mathematics\)),
+and prime numbers are useful.  I won't elaborate further here, as I am
+still learning in this area and reluctant to publish misunderstandings.
 
 ## Generator Point
 
