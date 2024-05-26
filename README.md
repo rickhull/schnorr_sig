@@ -72,6 +72,12 @@ the elliptic curve, `P`.
 the curve.  Technically, we would want to convert the large integer `P.x`
 to a binary string in order to make it a peer with `sk`.
 
+```
+group = ECDSA::Group::Secp256k1  # get a handle for secp256k1 curve
+point = group.generator * bignum # generate a point corresponding to sk
+pk = big2bin(point.x)            # public key: point.x as a binary string
+```
+
 ## Formatting
 
 * Binary String
