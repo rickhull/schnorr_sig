@@ -18,7 +18,7 @@ module SchnorrSig
   def self.bytestring!(str, size)
     string!(str)
     raise(EncodingError, str.encoding) unless str.encoding == Encoding::BINARY
-    str.size == size or raise(SizeError, str.size)
+    str.bytesize == size or raise(SizeError, str.bytesize)
   end
 
   # likely returns a Bignum, larger than a 64-bit hardware integer
