@@ -60,8 +60,8 @@ Let's conjure into existence a gigantic 32-byte integer:
 
 ```
 sk = Random.bytes(32)     # a binary string, length 32
-hex = sk.to_s(16)         # convert to a hex string like: "199ace9bc1 ..."
-bignum = [hex].pack('H*') # convert to a binary string like: "\x19\x9a ..."
+hex = [str].pack('H*')    # convert to a hex string like: "199ace9bc1 ..."
+bignum = hex.to_i(16)     # convert hex to integer, possibly a bignum
 ```
 
 `bignum` is the integer value of our private key, randomly generated.
