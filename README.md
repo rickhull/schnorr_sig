@@ -233,8 +233,9 @@ required.
 
 # Implementation
 
-There are two independent implementations, one aiming for as pure Ruby as
-possible, the other aiming for speed and correctness, relying on the
+There are two independent implementations, the primary aiming for as
+pure Ruby as is feasible while matching the BIP340 pseudocode,
+with the secondary aiming for speed and correctness, relying on the
 battle-tested [sep256k1 library](https://github.com/bitcoin-core/secp256k1)
 provided by the Bitcoin project.
 
