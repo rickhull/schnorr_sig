@@ -26,9 +26,11 @@ equation provide the exact definition of an elliptic curve.
 
 ![secp256k1: y^2 = x^3 + 7](assets/secp256k1.png)
 
-Elliptic curves have an algebraic structure which involve mathematical
-structures like Groups and Fields, and prime numbers are useful.  I won't
-elaborate further here, as I am still learning in this area.
+Elliptic curves have algebraic structures called
+[Groups](https://en.wikipedia.org/wiki/Group_\(mathematics\)) and
+[Fields](https://en.wikipedia.org/wiki/Field_\(mathematics\)),
+and prime numbers are useful.  I won't elaborate further here, as I am
+still learning in this area and reluctant to publish misunderstandings.
 
 ## Generator Point
 
