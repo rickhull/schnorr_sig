@@ -59,9 +59,9 @@ the highest value for a **Fixnum**, which corresponds to a hardware integer.
 Let's conjure into existence a gigantic 32-byte integer, `sk` (secret key):
 
 ```
-sk = Random.bytes(32)     # a binary string, length 32
-hex = [str].pack('H*')    # convert to a hex string like: "199ace9bc1 ..."
-bignum = hex.to_i(16)     # convert hex to integer, possibly a bignum
+sk = Random.bytes(32) # a binary string, length 32
+hex = [sk].pack('H*') # convert to a hex string like: "199ace9bc1 ..."
+bignum = hex.to_i(16) # convert hex to integer, possibly a bignum
 ```
 
 `sk` is now our 32-byte **secret key**, and `bignum` is the integer value
@@ -77,6 +77,10 @@ group = ECDSA::Group::Secp256k1  # get a handle for secp256k1 curve
 point = group.generator * bignum # generate a point corresponding to sk
 pk = big2bin(point.x)            # public key: point.x as a binary string
 ```
+
+The implementation of
+[big2bin](https://github.com/rickhull/schnorr_sig/blob/master/lib/schnorr_sig/util.rb#L30)
+is left as an exercise for the reader.
 
 ## Formatting
 
