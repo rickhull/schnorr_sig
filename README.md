@@ -12,8 +12,14 @@ This work is based on [BIP340](https://bips.xyz/340), one of the many
 [Bitcoin Improvement Proposals](https://bips.xyz/), which are open documents
 and specifications similar to
 [IETF RFCs](https://en.wikipedia.org/wiki/Request_for_Comments).
-
 BIP340 specifies elliptic curve `secp256k1` for use with Schnorr signatures.
+
+Note that elliptic curves are not ellipses, but instead cubic equations of
+the form: `y^2 = x^3 + ax + b` where `a` and `b` are the parameters of the
+resulting curve.  All points (x, y) which satisfy a given parameterized
+equation provide the exact definition of an elliptic curve.
+
+`secp256k1` uses `a = 0` and `b = 7`, so `y^2 = x^3 + 7`
 
 ## Approach
 
@@ -41,7 +47,7 @@ from [BIP340](https://bips.xyz/340).  i.e. A top-to-bottom implementation
 of most of the spec.  Enough to generate keypairs, signatures, and perform
 signature verification.  Extra care was taken to make the Ruby code match
 the pseudocode as close as feasible.  The pseudocode is commented
-[inline](lib/schnorr_sig.rb#L55).
+[inline](lib/schnorr_sig.rb#L58).
 
 A lot of care was taken to keep conversions and checks to a minimum.  The
 functions are very strict about what they accept and attempt to be as fast
