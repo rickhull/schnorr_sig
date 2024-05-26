@@ -113,7 +113,7 @@ strings.
 `BINARY` strings will tend to have a known, fixed size (almost certainly 32),
 and they can be expected to be converted to integers, likely Bignums.
 
-Hexadecimal strings (aka "hex") are like `"deadbeef0123456789abcdef00ff00ff".
+Hexadecimal strings (aka "hex") are like `"deadbeef0123456789abcdef00ff00ff"`.
 These are never used internally, but they are typically used at the user
 interface layer, as binary strings are not handled well by most user
 interfaces.
