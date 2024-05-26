@@ -14,6 +14,23 @@ and specifications similar to
 [IETF RFCs](https://en.wikipedia.org/wiki/Request_for_Comments).
 BIP340 specifies elliptic curve `secp256k1` for use with Schnorr signatures.
 
+Two separate implementations are provided.
+
+## Ruby Implementation
+
+This is the default implemenation, entirely Ruby code within this library,
+with mostly-Ruby dependencies:
+
+* [ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/)
+  - [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext)
+
+## "Fast" Implementation
+
+This is based on the [rbsecp256k1](https://github.com/etscrivner/rbsecp256k1)
+gem, which is not installed by default.  The gem wraps the **secp256k1**
+library from the Bitcoin project, which provides battle-tested performance
+and correctness and security guarantees.
+
 # Usage
 
 This library is provided as a RubyGem.  It has a single dependency on
