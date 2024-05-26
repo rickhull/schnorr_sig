@@ -18,7 +18,7 @@ Two separate implementations are provided.
 
 ## Ruby Implementation
 
-This is the default implemenation, entirely Ruby code within this library,
+This is the default implementation: entirely Ruby code within this library,
 with mostly-Ruby dependencies:
 
 * [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext)
