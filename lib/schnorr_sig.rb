@@ -11,8 +11,8 @@ module SchnorrSig
   class VerifyFail < Error; end
 
   GROUP = ECDSA::Group::Secp256k1
-  N = GROUP.order       # smaller than 256**32
-  P = GROUP.field.prime # smaller than N
+  P = GROUP.field.prime # smaller than 256**32
+  N = GROUP.order       # smaller than P
   B = GROUP.byte_length # 32
 
   # val (dot) G, returns ECDSA::Point

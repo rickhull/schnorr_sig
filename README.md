@@ -57,14 +57,15 @@ Here is one
 ## Generator Point
 
 Every elliptic curve has an *infinity point*, and one step away from the
-infinity point is a so-called *generator point*, `G`.  Add `G` to the infinity
-point; the result is `G`.  Add `G` again, and the result is `2G`.  Where `N`
-is the *order* of the curve, `NG` returns to the infinity point.
+infinity point is a so-called *generator point*, `G`, a pair of large
+integers, `(x, y)`.  Add `G` to the infinity point; the result is `G`.
+Add `G` again, and the result is `2G`.  Where `N` is the *order* of the
+curve, `NG` returns to the infinity point.
 
 You can multiply `G` by any integer < `N` to get a corresponding point on
-the curve. So `G` is a point, a pair of large integers, `(x, y)`.  `G` can
-be compressed to just the x-value, as the y-value can be derived from the
-x-value with a little bit of algebra: `y = sign(x) * sqrt(x^3 + ax + b)`.
+the curve, `(x, y)`. `G` can be compressed to just the x-value, as the
+y-value can be derived from the x-value with a little bit of algebra:
+`y = sign(x) * sqrt(x^3 + ax + b)`.
 
 ## Bignums
 
