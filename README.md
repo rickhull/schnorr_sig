@@ -222,8 +222,9 @@ required.
 ## Takeaways
 
 * For any given secret key (32 byte value), a public key is easily generated
+* A public key is an x-value on the curve
 * For any given x-value on the curve, the y-value is easily generated
-* For some curves, there can be two different y-values for an x-value
+* For most curves, there are two different y-values for an x-value
 * We are always dealing with 32-byte integers: **Bignums**
 * Converting between integer format and 32-byte strings can be expensive
 * The Schnorr algorithm requires lots of `string <--> integer` conversion
