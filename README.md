@@ -21,8 +21,8 @@ Two separate implementations are provided.
 This is the default implemenation, entirely Ruby code within this library,
 with mostly-Ruby dependencies:
 
-* [ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/)
-  - [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext)
+* [ecdsa_ext](https://github.com/azuchi/ruby_ecdsa_ext)
+  - [ecdsa](https://github.com/DavidEGrayson/ruby_ecdsa/)
 
 ## "Fast" Implementation
 
