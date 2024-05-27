@@ -9,6 +9,7 @@ module SchnorrSig
   class BoundsError < Error; end
   class SanityCheck < Error; end
   class VerifyFail < Error; end
+  class InfinityPoint < Error; end
 
   GROUP = ECDSA::Group::Secp256k1
   P = GROUP.field.prime # smaller than 256**32
@@ -40,7 +41,7 @@ module SchnorrSig
       big2bin(val)
     when ECDSA::Point
       # BIP340: The function bytes(P), where P is a point, returns bytes(x(P)).
-      val.infinity? ? ("\x00" * B).b : big2bin(val.x)
+      val.infinity? ? raise(InfinityPoint, va.inspect) : big2bin(val.x)
     else
       raise(SanityCheck, val.inspect)
     end
