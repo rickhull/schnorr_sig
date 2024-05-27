@@ -151,7 +151,7 @@ module SchnorrSig
   end
 
   # BIP340: The function lift_x(x), where x is a 256-bit unsigned integer,
-  #         returns the point P for which x(P) = x[10] and has_even_y(P),
+  #         returns the point P for which x(P) = x and has_even_y(P),
   #         or fails if x is greater than p-1 or no such point exists.
   # Input
   #   A large integer, x
