@@ -1,7 +1,11 @@
-# https://github.com/Gerg-L/nix-templates/blob/master/devShell%2Fflake.nix
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs = {
+      type = "github";
+      owner = "NixOS";
+      repo = "nixpkgs";
+      ref = "nixos-unstable";
+    };
   };
   outputs =
     { nixpkgs, ... }:
