@@ -92,6 +92,10 @@ require 'schnorr_sig/fast' # not 'schnorr_sig'
 # everything else as above ...
 ```
 
+Alternatively, ensure `ENV['SCHNORR_SIG']&.downcase == 'fast'`, and then
+`require 'schnorr_sig'` will try the fast implementation first, before
+falling back to the pure implementation.
+
 # Elliptic Curves
 
 Note that [elliptic curves](https://en.wikipedia.org/wiki/Elliptic_curve)
