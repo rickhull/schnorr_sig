@@ -1,5 +1,4 @@
-require ENV['SCHNORR_SIG']&.downcase == 'fast' ?
-          'schnorr_sig/fast' : 'schnorr_sig'
+require 'schnorr_sig'
 require 'csv'
 
 path = File.join(__dir__, 'vectors.csv')
