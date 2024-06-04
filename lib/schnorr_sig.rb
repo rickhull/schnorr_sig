@@ -1,3 +1,4 @@
+# never require both schnorr_sig/pure and schnorr_sig/fast
 if ENV['SCHNORR_SIG']&.downcase == 'fast'
   begin
     require 'schnorr_sig/fast'
