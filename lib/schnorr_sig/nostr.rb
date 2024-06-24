@@ -133,6 +133,7 @@ module SchnorrSig
     class Event
       class Error < RuntimeError; end
       class KeyError < Error; end
+      class SignatureMissing < Error; end
 
       # id: 32 bytes (hex = 64)
       # pubkey: 32 bytes (hex = 64)
@@ -224,17 +225,25 @@ module SchnorrSig
       # assign @signature, return 64 bytes binary
       def sign(secret_key)
         Nostr.binary!(secret_key, 32)
-        @signature = SchnorrSig.sign(secret_key, self.digest(memo: true))
+        @signature = SchnorrSig.sign(secret_key, self.digest(memo: false))
+      end
+
+      def signed?
+        @signature and @signature.bytesize == 64
+      end
+
+      def signed!
+        self.signed? or raise(SignatureMissing)
       end
 
       # return 128 bytes of hexadecimal, ASCII encoded
       def sig
-        SchnorrSig.bin2hex(@signature) if @signature
+        self.signed! and SchnorrSig.bin2hex(@signature)
       end
 
       # return a Ruby hash, suitable for JSON conversion to NIPS01 Event object
       def object_hash
-        {
+        self.signed! and {
           id: self.id,
           pubkey: @pubkey,
           created_at: @created_at,
@@ -251,6 +260,7 @@ module SchnorrSig
 
       # add an array of 2+ strings to @tags
       def add_tag(tag, value, *rest)
+        @digest = nil # invalidate any prior digest
         @tags.push([Nostr.typecheck!(tag, String),
                     Nostr.typecheck!(value, String)] +
                    rest.each { |s| Nostr.typecheck!(s, String) })
@@ -261,19 +271,9 @@ module SchnorrSig
         add_tag('e', Nostr.hex!(eid_hex, 64), *rest)
       end
 
-      def ref_event_object(obj, *rest)
-        ref_event(event.id, *rest)
-      end
-
       # add a pubkey tag based on pubkey, 64 bytes hex encoded
       def ref_pubkey(pk_hex, *rest)
         add_tag('p', Nostr.hex!(pk_hex, 64), *rest)
-      end
-
-      # add a pubkey tag based on pk, 32 bytes binary
-      def ref_pk(pk, *rest)
-        ref_pubkey(SchnorrSig.bin2hex(Nostr.binary!(pk, 32)), *rest)
-        #      add_tag('p', SchnorrSig.bin2hex(Nostr.binary!(pk, 32)), *rest)
       end
 
       # kind: and one of [pubkey:, pk:] required
