@@ -33,9 +33,11 @@ module SchnorrSig
   end
 
   # convert a binary string to a lowercase hex string
+  # steep:ignore:start
   def self.bin2hex(str)
     str.unpack1('H*')
   end
+  # steep:ignore:end
 
   # convert a hex string to a binary string
   def self.hex2bin(hex)

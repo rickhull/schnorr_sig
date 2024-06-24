@@ -7,6 +7,13 @@ end
 
 task default: :test
 
+desc "Run type checks (RBS + Steep)"
+task :steep do
+  ENV['RUBYOPT'] = ENV['RUBYOPT'].sub('--enable-frozen-string-literal', '')
+  bindir = Dir[File.join(ENV['HOME'], '.local/share/gem/ruby/*/bin')].last
+  bindir ? sh("#{File.join(bindir, 'steep')} check") : puts("can't find steep")
+end
+
 begin
   require 'buildar'
 

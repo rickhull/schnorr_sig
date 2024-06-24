@@ -11,7 +11,7 @@ module SchnorrSig
   class VerifyFail < Error; end
   class InfinityPoint < Error; end
 
-  GROUP = ECDSA::Group::Secp256k1
+  GROUP = ECDSA::Group::Secp256k1 # steep:ignore
   P = GROUP.field.prime # smaller than 256**32
   N = GROUP.order       # smaller than P
   B = GROUP.byte_length # 32
@@ -39,7 +39,7 @@ module SchnorrSig
       # BIP340: The function bytes(x), where x is an integer,
       # returns the 32-byte encoding of x, most significant byte first.
       big2bin(val)
-    when ECDSA::Point
+    when ECDSA::Point # steep:ignore
       # BIP340: The function bytes(P), where P is a point, returns bytes(x(P)).
       val.infinity? ? raise(InfinityPoint, val.inspect) : big2bin(val.x)
     else
@@ -129,11 +129,11 @@ module SchnorrSig
     p = lift_x(int(pk))
 
     # BIP340: Let r = int(sig[0:32]) fail if r >= p
-    r = int(sig[0..B-1])
+    r = int(sig[0..B-1]) # steep:ignore
     raise(BoundsError, "r >= p") if r >= P
 
     # BIP340: Let s = int(sig[32:64]); fail if s >= n
-    s = int(sig[B..-1])
+    s = int(sig[B..-1])  # steep:ignore
     raise(BoundsError, "s >= n") if s >= N
 
     # BIP340:
@@ -201,7 +201,7 @@ module SchnorrSig
 
   # as above, but using SecureRandom
   def self.secure_keypair
-    sk = SecureRandom.bytes(B)
+    sk = SecureRandom.bytes(B) # steep:ignore
     [sk, pubkey(sk)]
   end
 end

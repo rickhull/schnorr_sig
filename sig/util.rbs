@@ -1,0 +1,22 @@
+module SchnorrSig
+  def self.integer!: (untyped i) -> true
+  def self.string!: (untyped str) -> true
+  def self.bytestring!: (untyped str, untyped size) -> true
+
+  def self.bin2big: (String str) -> Integer
+  def self.big2bin: (Integer bignum) -> String
+  def self.bin2hex: (String str) -> String
+  def self.hex2bin: (String hex) -> String
+
+  class InputError < RuntimeError
+  end
+
+  class SizeError < InputError
+  end
+
+  class TypeError < InputError
+  end
+
+  class EncodingError < InputError
+  end
+end
