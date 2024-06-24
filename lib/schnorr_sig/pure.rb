@@ -41,7 +41,7 @@ module SchnorrSig
       big2bin(val)
     when ECDSA::Point
       # BIP340: The function bytes(P), where P is a point, returns bytes(x(P)).
-      val.infinity? ? raise(InfinityPoint, va.inspect) : big2bin(val.x)
+      val.infinity? ? raise(InfinityPoint, val.inspect) : big2bin(val.x)
     else
       raise(SanityCheck, val.inspect)
     end
