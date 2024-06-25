@@ -177,7 +177,7 @@ module SchnorrSig
         when 2, :recommend_server
           raise(Error, "kind value 2 is deprecated")
         else
-          KINDS.fetch(val)
+          KINDS.fetch(val) # steep:ignore
         end
       end
 
@@ -210,7 +210,7 @@ module SchnorrSig
 
       # assign @digest, return 32 bytes binary
       def digest(memo: true)
-        return @digest if memo and @digest
+        return @digest if memo and @digest # steep:ignore
 
         # we are creating or recreating the event
         @created_at = nil
@@ -229,13 +229,14 @@ module SchnorrSig
       end
 
       def signed?
-        @signature and @signature.bytesize == 64
+        @signature and @signature.bytesize == 64 # steep:ignore
       end
 
       def signed!
         self.signed? or raise(SignatureMissing)
       end
 
+      # steep:ignore:start
       # return 128 bytes of hexadecimal, ASCII encoded
       def sig
         self.signed! and SchnorrSig.bin2hex(@signature)
@@ -253,6 +254,7 @@ module SchnorrSig
           sig: self.sig,
         }
       end
+      # steep:ignore:end
 
       def json_object
         Nostr.json(self.object_hash)
@@ -277,9 +279,9 @@ module SchnorrSig
       end
 
       # kind: and one of [pubkey:, pk:] required
-      def ref_replace(*rest, kind:, pubkey: nil, pk: nil, d_tag: nil)
+      def ref_replace(*rest, kind:, pubkey: nil, pk: nil, d_tag: '')
         raise(ArgumentError, "public key required") if pubkey.nil? and pk.nil?
-        pubkey ||= SchnorrSig.bin2hex(pk)
+        pubkey ||= SchnorrSig.bin2hex(pk) # steep:ignore
         val = [Event.kind(kind), Nostr.hex!(pubkey, 64), d_tag].join(':')
         add_tag('a', val, *rest)
       end
