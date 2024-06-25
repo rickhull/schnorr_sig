@@ -5,6 +5,7 @@ require 'digest'
 module SchnorrSig
   module Nostr
     class Error < RuntimeError; end
+    class DeprecatedError < Error; end
     class EncodingError < Error; end
     class SizeError < Error; end
 
@@ -173,7 +174,7 @@ module SchnorrSig
       def self.kind(val)
         case val
         when 2, :recommend_server
-          raise(Error, "kind value 2 is deprecated")
+          raise(DeprecatedError, "kind value 2")
         when Integer
           val
         else

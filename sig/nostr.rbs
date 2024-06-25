@@ -3,6 +3,9 @@ module SchnorrSig
     class Error < RuntimeError
     end
 
+    class DeprecatedError < Error
+    end
+
     class EncodingError < Error
     end
 
