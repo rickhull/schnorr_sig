@@ -172,12 +172,12 @@ module SchnorrSig
 
       def self.kind(val)
         case val
-        when 0, 1, 3, 4
-          val
         when 2, :recommend_server
           raise(Error, "kind value 2 is deprecated")
+        when Integer
+          val
         else
-          KINDS.fetch(val) # steep:ignore
+          KINDS.fetch(val)
         end
       end
 
