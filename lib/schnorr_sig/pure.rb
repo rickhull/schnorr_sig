@@ -1,4 +1,4 @@
-require 'schnorr_sig/util'             # project
+require 'schnorr_sig/common'           # project
 require 'ecdsa_ext'                    # gem
 autoload :SecureRandom, 'securerandom' # stdlib
 

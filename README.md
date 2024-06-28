@@ -190,7 +190,7 @@ pk = big2bin(point.x)            # public key: point.x as a binary string
 ```
 
 The implementation of
-[big2bin](https://github.com/rickhull/schnorr_sig/blob/master/lib/schnorr_sig/util.rb#L30)
+[big2bin](https://github.com/rickhull/schnorr_sig/blob/master/lib/schnorr_sig/common.rb#L30)
 is left as an exercise for the reader.
 
 ## Formatting

@@ -1,5 +1,5 @@
-require 'schnorr_sig/util' # project
-require 'rbsecp256k1'      # gem, C extension
+require 'schnorr_sig/common' # project
+require 'rbsecp256k1'        # gem, C extension
 
 # re-open SchnorrSig to add more functions, errors, and constants
 module SchnorrSig
