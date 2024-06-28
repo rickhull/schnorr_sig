@@ -16,10 +16,10 @@ module SchnorrSig
   N = GROUP.order       # smaller than P
   B = GROUP.byte_length # 32
 
-  # val (dot) G, returns ECDSA::Point
-  def self.dot_group(val)
-    # ecdsa_ext uses jacobian projection: 10x faster than GROUP.generator * val
-    (GROUP.generator.to_jacobian * val).to_affine
+  # int (dot) G, returns ECDSA::Point
+  def self.dot_group(int)
+    # ecdsa_ext uses jacobian projection: 10x faster than GROUP.generator * int
+    (GROUP.generator.to_jacobian * int).to_affine
   end
 
   # returns even_val or N - even_val

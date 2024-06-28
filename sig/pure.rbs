@@ -19,7 +19,7 @@ module SchnorrSig
   N: Integer
   B: Integer
 
-  def self.dot_group: (Integer val) -> untyped # ECDSA::Point
+  def self.dot_group: (Integer int) -> untyped # ECDSA::Point
   def self.select_even_y: (untyped point, Integer even_val) -> Integer
   alias self.int self.bin2big
   def self.bytes: (Integer val) -> String
