@@ -3,21 +3,21 @@ require 'minitest/autorun'
 
 describe SchnorrSig do
   it "converts any integer to a point on the curve" do
-    expect(SchnorrSig.dot_group(99)).must_be_kind_of ECDSA::Point
-    expect(SchnorrSig.dot_group(0).infinity?).must_equal true
-    p1 = SchnorrSig.dot_group(1)
+    expect(SchnorrSig.point(99)).must_be_kind_of ECDSA::Point
+    expect(SchnorrSig.point(0).infinity?).must_equal true
+    p1 = SchnorrSig.point(1)
     expect(p1.x).must_be :>, 999_999
     expect(p1.y).must_be :>, 999_999
   end
 
-  it "selects (x) or (N-x), depending on if point.y is even" do
-    even_y = SchnorrSig.dot_group(99)
+  it "selects (x) or (N-x), if point.y is even or odd" do
+    even_y = SchnorrSig.point(99)
     expect(even_y.y.even?).must_equal true
 
     expect(SchnorrSig.select_even_y(even_y, 0)).must_equal 0
     expect(SchnorrSig.select_even_y(even_y, 1)).must_equal 1
 
-    odd_y = SchnorrSig.dot_group(10)
+    odd_y = SchnorrSig.point(10)
     expect(odd_y.y.even?).must_equal false
 
     expect(SchnorrSig.select_even_y(odd_y, 0)).wont_equal 0

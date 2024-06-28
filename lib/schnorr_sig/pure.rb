@@ -17,7 +17,7 @@ module SchnorrSig
   B = GROUP.byte_length # 32
 
   # int (dot) G, returns ECDSA::Point
-  def self.dot_group(int)
+  def self.point(int)
     # ecdsa_ext uses jacobian projection: 10x faster than GROUP.generator * int
     (GROUP.generator.to_jacobian * int).to_affine
   end
@@ -62,7 +62,7 @@ module SchnorrSig
     raise(BoundsError, "d0") if !d0.positive? or d0 >= N
 
     # BIP340: Let P = d' . G
-    p = dot_group(d0) # this is a point on the elliptic curve
+    p = point(d0) # this is a point on the elliptic curve
     bytes_p = bytes(p)
 
     # BIP340: Let d = d' if has_even_y(P), otherwise let d = n - d'
@@ -80,7 +80,7 @@ module SchnorrSig
     raise(BoundsError, "k0") if !k0.positive?
 
     # BIP340: Let R = k' . G
-    r = dot_group(k0) # this is a point on the elliptic curve
+    r = point(k0) # this is a point on the elliptic curve
     bytes_r = bytes(r)
 
     # BIP340: Let k = k' if has_even_y(R), otherwise let k = n - k'
@@ -146,7 +146,7 @@ module SchnorrSig
     # BIP340: Fail if not has_even_y(R)
     # BIP340: Fail if x(R) != r
     # BIP340: Return success iff no failure occurred before reaching this point
-    big_r = dot_group(s) + p.multiply_by_scalar(e).negate
+    big_r = point(s) + p.multiply_by_scalar(e).negate
     !big_r.infinity? and big_r.y.even? and big_r.x == r
   end
 
@@ -190,7 +190,7 @@ module SchnorrSig
     # BIP340: Return bytes(d' . G)
     d0 = int(sk)
     raise(BoundsError, "d0") if !d0.positive? or d0 >= N
-    bytes(dot_group(d0))
+    bytes(point(d0))
   end
 
   # generate a new keypair based on random data
