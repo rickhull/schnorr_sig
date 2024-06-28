@@ -6,7 +6,7 @@ include SchnorrSig
 marge = Nostr::User.new(name: 'Marge')
 hello = marge.text_note('Good morning, Homie')
 
-puts "Marge Simpson: hello world"
+puts "Marge Simpson: hello world, generated keypair"
 puts
 
 puts "Serialized"
@@ -28,7 +28,7 @@ response = homer.text_note('Good morning, Marge')
 response.ref_event(hello.id)
 
 puts
-puts "Homer: hello back"
+puts "Homer: hello back, private key, ref prior event"
 puts
 
 puts "Serialized"
@@ -44,7 +44,7 @@ puts
 #####
 
 puts
-puts "Homer: love letter"
+puts "Homer: love letter, ref Marge's pubkey"
 puts
 
 love_letter = homer.text_note("I love you Marge.\nLove, Homie")
@@ -92,7 +92,7 @@ puts
 #####
 
 puts
-puts "lisa follows her family"
+puts "Lisa follows her family"
 puts
 
 lisa = Nostr::User.new(name: 'Lisa')
