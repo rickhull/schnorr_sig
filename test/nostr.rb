@@ -60,13 +60,6 @@ describe Nostr do
         expect(E.kind(5)).must_equal 5
         expect { E.kind(:unknown) }.must_raise
       end
-
-      it "signs a message given a secret key" do
-        sig = E.sign('asdf', SK)
-        expect(sig).must_be_kind_of String
-        expect(sig.length).must_equal 64
-        expect(sig.encoding).must_equal Encoding::BINARY
-      end
     end
 
     def new_event(msg = 'test')

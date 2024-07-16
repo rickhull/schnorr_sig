@@ -110,11 +110,6 @@ module SchnorrSig
         end
       end
 
-      # returns 64 byte binary string
-      def self.sign(msg, secret_key)
-        SchnorrSig.sign(secret_key, msg)
-      end
-
       attr_reader :content, :kind, :created_at, :pubkey, :signature
 
       def initialize(content = '', kind: :text_note, pubkey:)
