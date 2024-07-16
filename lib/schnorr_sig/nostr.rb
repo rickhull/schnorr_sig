@@ -289,5 +289,58 @@ module SchnorrSig
       end
       alias_method :direct_msg, :encrypted_text_message
     end
+
+    class Relay
+      # deconstruct and typecheck, return a ruby hash
+      def self.hash(json_str)
+        h = Nostr.parse(json_str)
+        %w[id pubkey created_at kind tags content sig].each { |key|
+          v = h.fetch key
+          case key
+          when "id", "pubkey", "content", "sig"
+            raise("expected String, got #{v.inspect}") unless v.is_a? String
+          when "tags"
+            raise("Expected Array, got #{v.inspect}") unless v.is_a? Array
+            v.each { |a|
+              raise("Expected Array, got #{a.inspect}") unless a.is_a? Array
+              a.each { |s|
+                raise("Expected String, got #{s.inspect}") if !s.is_a? String
+              }
+            }
+          when "created_at", "kind"
+            raise("Expected Integer, got #{v.inspect}") unless v.is_a? Integer
+          else
+            raise "unexpected"
+          end
+        }
+        h.transform_keys(&:to_sym)
+      end
+
+      def self.serialize(json_str)
+        h = self.hash(json_str)
+        Nostr.json([0,
+                    h.fetch(:pubkey),
+                    h.fetch(:created_at),
+                    h.fetch(:kind),
+                    h.fetch(:tags),
+                    h.fetch(:content),])
+      end
+
+      def self.verify(json_str)
+        h = self.hash(json_str)
+        s = self.serialize(json_str)
+
+        # check the id
+        id = SchnorrSig.hex2bin(h.fetch(:id))
+        raise "could not verify id" if id != Digest::SHA256.digest(s)
+
+        # verify the signature
+        sig = SchnorrSig.hex2bin(h.fetch(:sig))
+        pk = SchnorrSig.hex2bin(h.fetch(:pubkey))
+        raise "could not verify signature" if !SchnorrSig.verify?(pk, id, sig)
+
+        h
+      end
+    end
   end
 end
