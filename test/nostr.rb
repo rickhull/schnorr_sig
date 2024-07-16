@@ -158,11 +158,11 @@ describe Nostr do
     end
   end
 
-  describe Nostr::Session do
+  describe Nostr::Generator do
     it "requires a public key" do
       pk = Random.bytes(32)
-      u = Nostr::Session.new(pk: pk)
-      expect(u).must_be_kind_of Nostr::Session
+      u = Nostr::Generator.new(pk: pk)
+      expect(u).must_be_kind_of Nostr::Generator
 
       pubkey = u.pubkey
       expect(pubkey).must_be_kind_of String

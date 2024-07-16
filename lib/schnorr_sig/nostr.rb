@@ -216,7 +216,7 @@ module SchnorrSig
       end
     end
 
-    class Session
+    class Generator
       attr_reader :pubkey
 
       def initialize(pubkey: nil, pk: nil)

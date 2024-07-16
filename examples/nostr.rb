@@ -7,10 +7,8 @@ pubkeys = {}
 # generate keypair
 marge_sk, pk = SchnorrSig.keypair
 
-# initiate a session
-marge = Nostr::Session.new(pk: pk)
-
-# create a message
+# create a message using the public key
+marge = Nostr::Generator.new(pk: pk)
 hello = marge.text_note('Good morning, Homie')
 
 puts "Marge Simpson: hello world"
@@ -20,7 +18,7 @@ puts "Serialized"
 p hello.serialize
 puts
 
-# sign the message
+# sign the message with the secret key
 hello.sign(marge_sk)
 
 puts "Event Object"
@@ -29,14 +27,12 @@ puts
 
 #####
 
-# use our own secret key; generate the public key
+# bring our own secret key; generate the public key
 homer_sk = Random.bytes(32)
 pk = SchnorrSig.pubkey(homer_sk)
 
-# initiate a session
-homer = Nostr::Session.new(pk: pk)
-
-# create a message
+# create a message using the public key
+homer = Nostr::Generator.new(pk: pk)
 response = homer.text_note('Good morning, Marge')
 
 # reference an earlier message
@@ -50,6 +46,7 @@ puts "Serialized"
 p response.serialize
 puts
 
+# sign the message with the secret key
 response.sign(homer_sk)
 
 puts "Event Object"
@@ -59,7 +56,7 @@ puts
 #####
 
 maggie_sk, pk = SchnorrSig.keypair
-maggie = Nostr::Session.new(pk: pk)
+maggie = Nostr::Generator.new(pk: pk)
 
 puts
 puts "Maggie: love letter, ref Marge's pubkey"
@@ -86,7 +83,7 @@ puts
 
 
 bart_sk, bart_pk = SchnorrSig.keypair
-bart = Nostr::Session.new(pk: pk)
+bart = Nostr::Generator.new(pk: pk)
 profile = bart.set_metadata(name: 'Bart',
                             about: 'Bartholomew Jojo Simpson',
                             picture: 'https://upload.wikimedia.org' +
@@ -113,7 +110,7 @@ puts "Lisa follows her family"
 puts
 
 lisa_sk, pk = SchnorrSig.keypair
-lisa = Nostr::Session.new(pk: pk)
+lisa = Nostr::Generator.new(pk: pk)
 
 pubkey_hsh = {
   marge.pubkey => ["wss://thesimpsons.com/", "marge"],
