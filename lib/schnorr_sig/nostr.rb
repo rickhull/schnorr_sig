@@ -216,7 +216,64 @@ module SchnorrSig
       end
     end
 
-    class Generator
+    class Device
+      class Error < RuntimeError; end
+      class IdCheck < Error; end
+      class SignatureCheck < Error; end
+
+      # deconstruct and typecheck, return a ruby hash
+      def self.hash(json_str)
+        h = Nostr.parse(json_str)
+        %w[id pubkey created_at kind tags content sig].each { |key|
+          v = h.fetch key
+          case key
+          when "id", "pubkey", "content", "sig"
+            raise("expected String, got #{v.inspect}") unless v.is_a? String
+          when "tags"
+            raise("Expected Array, got #{v.inspect}") unless v.is_a? Array
+            v.each { |a|
+              raise("Expected Array, got #{a.inspect}") unless a.is_a? Array
+              a.each { |s|
+                raise("Expected String, got #{s.inspect}") if !s.is_a? String
+              }
+            }
+          when "created_at", "kind"
+            raise("Expected Integer, got #{v.inspect}") unless v.is_a? Integer
+          else
+            raise "unexpected"
+          end
+        }
+        h.transform_keys(&:to_sym)
+      end
+
+      # (re-)create the JSON array serialization
+      def self.serialize(hash)
+        Nostr.json([0,
+                    hash.fetch(:pubkey),
+                    hash.fetch(:created_at),
+                    hash.fetch(:kind),
+                    hash.fetch(:tags),
+                    hash.fetch(:content),])
+      end
+
+      def self.verify(json_str, check_id: true)
+        h = self.hash(json_str)
+
+        # check the id
+        id = SchnorrSig.hex2bin(h.fetch(:id))
+        if check_id and id != Digest::SHA256.digest(self.serialize(h))
+          raise(IdCheck, h.fetch(:id))
+        end
+
+        # verify the signature
+        unless SchnorrSig.verify?(SchnorrSig.hex2bin(h.fetch(:pubkey)),
+                                  id,
+                                  SchnorrSig.hex2bin(h.fetch(:sig)))
+          raise(SignatureCheck, h[:sig])
+        end
+        h
+      end
+
       attr_reader :pubkey
 
       def initialize(pubkey: nil, pk: nil)
@@ -274,65 +331,6 @@ module SchnorrSig
         Event.new(content, kind: :encrypted_text_message, pubkey: @pubkey)
       end
       alias_method :direct_msg, :encrypted_text_message
-    end
-
-    class Relay
-      class Error < RuntimeError; end
-      class IdCheck < Error; end
-      class SignatureCheck < Error; end
-
-      # deconstruct and typecheck, return a ruby hash
-      def self.hash(json_str)
-        h = Nostr.parse(json_str)
-        %w[id pubkey created_at kind tags content sig].each { |key|
-          v = h.fetch key
-          case key
-          when "id", "pubkey", "content", "sig"
-            raise("expected String, got #{v.inspect}") unless v.is_a? String
-          when "tags"
-            raise("Expected Array, got #{v.inspect}") unless v.is_a? Array
-            v.each { |a|
-              raise("Expected Array, got #{a.inspect}") unless a.is_a? Array
-              a.each { |s|
-                raise("Expected String, got #{s.inspect}") if !s.is_a? String
-              }
-            }
-          when "created_at", "kind"
-            raise("Expected Integer, got #{v.inspect}") unless v.is_a? Integer
-          else
-            raise "unexpected"
-          end
-        }
-        h.transform_keys(&:to_sym)
-      end
-
-      def self.serialize(hash)
-        Nostr.json([0,
-                    hash.fetch(:pubkey),
-                    hash.fetch(:created_at),
-                    hash.fetch(:kind),
-                    hash.fetch(:tags),
-                    hash.fetch(:content),])
-      end
-
-      def self.verify(json_str, check_id: true)
-        h = self.hash(json_str)
-        s = self.serialize(h)
-
-        # check the id
-        id = SchnorrSig.hex2bin(h.fetch(:id))
-        if check_id and id != Digest::SHA256.digest(s)
-          raise(IdCheck, h.fetch(:id))
-        end
-
-        # verify the signature
-        sig = SchnorrSig.hex2bin(h.fetch(:sig))
-        pk = SchnorrSig.hex2bin(h.fetch(:pubkey))
-        if !SchnorrSig.verify?(pk, id, sig)
-          raise(SignatureCheck, h.fetch(:sig))
-        end
-        h
-      end
     end
   end
 end
