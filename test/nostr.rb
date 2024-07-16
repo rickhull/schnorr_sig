@@ -159,12 +159,9 @@ describe Nostr do
   end
 
   describe Nostr::User do
-    it "has a name, about, picture, and keypair (sk and pk)" do
-      u = Nostr::User.new('test')
+    it "has a keypair (sk and pk)" do
+      u = Nostr::User.new
       expect(u).must_be_kind_of Nostr::User
-      expect(u.name).must_equal 'test'
-      expect(u.about).must_equal ''
-      expect(u.picture).must_equal ''
 
       sk, pk = u.sk, u.pk
       expect(sk).must_be_kind_of String
@@ -175,7 +172,7 @@ describe Nostr do
     end
 
     it "provides a hex representation of the public key" do
-      u = Nostr::User.new('test')
+      u = Nostr::User.new
       hex = u.pubkey
       expect(Nostr.hex!(hex, 64)).must_equal hex
     end

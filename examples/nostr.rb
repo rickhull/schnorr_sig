@@ -3,7 +3,7 @@ require 'schnorr_sig/nostr'
 include SchnorrSig
 
 # keypair will be generated
-marge = Nostr::User.new('Marge')
+marge = Nostr::User.new
 hello = marge.text_note('Good morning, Homie')
 
 puts "Marge Simpson: hello world, generated keypair"
@@ -22,8 +22,7 @@ puts
 #####
 
 # use our own secret key; pubkey will be generated
-homer = Nostr::User.new('Homer', about: 'Homer Jay Simpson',
-                        sk: Random.bytes(32))
+homer = Nostr::User.new(sk: Random.bytes(32))
 response = homer.text_note('Good morning, Marge')
 response.ref_event(hello.id)
 
@@ -69,11 +68,11 @@ puts
 
 # we'll "bring our own" keypair
 sk, pk = SchnorrSig.keypair
-bart = Nostr::User.new('Bart',
-                       about: 'Bartholomew Jojo Simpson',
-                       picture: 'https://upload.wikimedia.org/wikipedia/en/a/aa/Bart_Simpson_200px.png',
-                       sk: sk, pk: pk)
-profile = bart.set_metadata
+bart = Nostr::User.new(sk: sk, pk: pk)
+profile = bart.set_metadata(name: 'Bart',
+                            about: 'Bartholomew Jojo Simpson',
+                            picture: 'https://upload.wikimedia.org' +
+                            '/wikipedia/en/a/aa/Bart_Simpson_200px.png')
 
 puts "Serialized"
 p profile.serialize
@@ -95,11 +94,17 @@ puts
 puts "Lisa follows her family"
 puts
 
-lisa = Nostr::User.new('Lisa')
-# keys = [marge.pk, homer.pk, bart.pk
-following = lisa.contact_list({ marge.pubkey => [],
-                                homer.pubkey => [],
-                                bart.pubkey  => [], })
+lisa = Nostr::User.new
+
+following = lisa.contact_list({ marge.pubkey => ["wss://thesimpsons.com/",
+                                                 "marge"
+                                                ],
+                                homer.pubkey => ["wss://thesimpsons.com/",
+                                                 "homer"
+                                                ],
+                                bart.pubkey  => ["wss://thesimpsons.com/",
+                                                 "bart"
+                                                ], })
 
 puts "Serialized"
 p following.serialize

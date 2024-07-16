@@ -219,12 +219,9 @@ module SchnorrSig
     # this class stores user profile info, keys, and is responsible for
     # creating events (messages, etc)
     class User
-      attr_reader :name, :about, :picture, :sk, :pk
+      attr_reader :sk, :pk
 
-      def initialize(name, about: '', picture: '', sk: nil, pk: nil)
-        @name = Nostr.string!(name)
-        @about = Nostr.string!(about)
-        @picture = Nostr.string!(picture)
+      def initialize(sk: nil, pk: nil)
         if sk
           @sk = Nostr.binary!(sk, 32)
           @pk = pk.nil? ? SchnorrSig.pubkey(@sk) : Nostr.binary!(pk, 32)
@@ -253,22 +250,21 @@ module SchnorrSig
       end
 
       # Input
-      #   (about: string)
-      #   (picture: string)
+      #   name: string
+      #   about: string
+      #   picture: string, URL
       # Output
       #   Event
       #     kind: 0, set_metadata
       #     content: {
       #       name: <username>, about: <string>, picture: <url, string>
       #     }
-      def set_metadata(about: nil, picture: nil, **kwargs)
-        @about = about if about and about != @about
-        @picture = picture if picture and picture != @picture
-        hash = kwargs.merge({ name:    @name,
-                              about:   Nostr.string!(@about),
-                              picture: Nostr.string!(@picture), })
+      def set_metadata(**kwargs)
+        Nostr.string!(kwargs.fetch(:name))
+        Nostr.string!(kwargs.fetch(:about))
+        Nostr.string!(kwargs.fetch(:picture))
 
-        new_event(Nostr.json(hash), kind: :set_metadata)
+        new_event(Nostr.json(kwargs), kind: :set_metadata)
       end
       alias_method :profile, :set_metadata
 
