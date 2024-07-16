@@ -291,6 +291,10 @@ module SchnorrSig
     end
 
     class Relay
+      class Error < RuntimeError; end
+      class IdCheck < Error; end
+      class SignatureCheck < Error; end
+
       # deconstruct and typecheck, return a ruby hash
       def self.hash(json_str)
         h = Nostr.parse(json_str)
@@ -316,29 +320,31 @@ module SchnorrSig
         h.transform_keys(&:to_sym)
       end
 
-      def self.serialize(json_str)
-        h = self.hash(json_str)
+      def self.serialize(hash)
         Nostr.json([0,
-                    h.fetch(:pubkey),
-                    h.fetch(:created_at),
-                    h.fetch(:kind),
-                    h.fetch(:tags),
-                    h.fetch(:content),])
+                    hash.fetch(:pubkey),
+                    hash.fetch(:created_at),
+                    hash.fetch(:kind),
+                    hash.fetch(:tags),
+                    hash.fetch(:content),])
       end
 
-      def self.verify(json_str)
+      def self.verify(json_str, check_id: true)
         h = self.hash(json_str)
-        s = self.serialize(json_str)
+        s = self.serialize(h)
 
         # check the id
         id = SchnorrSig.hex2bin(h.fetch(:id))
-        raise "could not verify id" if id != Digest::SHA256.digest(s)
+        if check_id and id != Digest::SHA256.digest(s)
+          raise(IdCheck, h.fetch(:id))
+        end
 
         # verify the signature
         sig = SchnorrSig.hex2bin(h.fetch(:sig))
         pk = SchnorrSig.hex2bin(h.fetch(:pubkey))
-        raise "could not verify signature" if !SchnorrSig.verify?(pk, id, sig)
-
+        if !SchnorrSig.verify?(pk, id, sig)
+          raise(SignatureCheck, h.fetch(:sig))
+        end
         h
       end
     end
