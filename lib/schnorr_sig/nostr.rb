@@ -65,13 +65,13 @@ module SchnorrSig
       class KeyError < Error; end
       class SignatureMissing < Error; end
 
-      # id: 32 bytes (hex = 64)
-      # pubkey: 32 bytes (hex = 64)
+      # id: 64 hex chars (32B)
+      # pubkey: 64 hex chars (32B)
       # created_at: unix seconds
       # kind: 0..65535
       # tags: []
-      # content: "hello world"
-      # sig: 64 bytes (hex = 128)
+      # content: any string
+      # sig: 128 hex chars (64B)
 
       # the id is a SHA256 of the serialized event:
       # [
@@ -84,13 +84,12 @@ module SchnorrSig
       # ]
 
       # 1. using public key:
-      # 1a. generate content: "hello world"
-      # 1b. set kind
-      # 1c. set tags
-      # 2. timestamp
-      # 3. generate id
-      #
-      # 4. sign (requires id and priv key)
+      # 1a. generate content: String
+      # 1b. set kind: Integer
+      # 1c. set tags: Array
+      # 2. timestamp: Integer
+      # 3. generate id: SHA256
+      # 4. sign(sk): 64B
 
       KINDS = {
         set_metadata: 0,
@@ -215,6 +214,12 @@ module SchnorrSig
         add_tag('a', val, *rest)
       end
     end
+
+
+    #
+    #####################
+    #
+
 
     class Device
       class Error < RuntimeError; end
