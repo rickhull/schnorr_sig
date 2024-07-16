@@ -216,37 +216,26 @@ module SchnorrSig
       end
     end
 
-    # this class stores user profile info, keys, and is responsible for
-    # creating events (messages, etc)
-    class User
-      attr_reader :sk, :pk
+    class Session
+      attr_reader :pubkey
 
-      def initialize(sk: nil, pk: nil)
-        if sk
-          @sk = Nostr.binary!(sk, 32)
-          @pk = pk.nil? ? SchnorrSig.pubkey(@sk) : Nostr.binary!(pk, 32)
+      def initialize(pubkey: nil, pk: nil)
+        if pubkey
+          @pubkey = SchnorrSig.hex!(pubkey, 64)
+        elsif pk
+          @pubkey = SchnorrSig.bin2hex(Nostr.binary!(pk, 32))
         else
-          @sk, @pk = SchnorrSig.keypair
+          raise "public key is required"
         end
       end
 
-      def pubkey
-        SchnorrSig.bin2hex @pk
-      end
-
-      # returns an Event
-      def new_event(content, kind:)
-        Event.new(content, kind: kind, pubkey: self.pubkey)
-      end
-
-      # returns 64 bytes binary
-      def sign(event)
-        event.sign(@sk)
+      def pk
+        SchnorrSig.hex2bin @pubkey
       end
 
       # returns an Event, kind: 1, text_note
       def text_note(content)
-        new_event(content, kind: :text_note)
+        Event.new(content, kind: :text_note, pubkey: @pubkey)
       end
 
       # Input
@@ -264,7 +253,7 @@ module SchnorrSig
         Nostr.string!(kwargs.fetch(:about))
         Nostr.string!(kwargs.fetch(:picture))
 
-        new_event(Nostr.json(kwargs), kind: :set_metadata)
+        Event.new(Nostr.json(kwargs), kind: :set_metadata, pubkey: @pubkey)
       end
       alias_method :profile, :set_metadata
 
@@ -272,16 +261,17 @@ module SchnorrSig
       #   pubkey_hsh: a ruby hash of the form
       #     "deadbeef1234abcdef" => ["wss://alicerelay.com/", "alice"]
       def contact_list(pubkey_hsh)
-        list = new_event('', kind: :contact_list)
+        list = Event.new('', kind: :contact_list, pubkey: @pubkey)
         pubkey_hsh.each { |pubkey, ary|
-          list.ref_pubkey(Nostr.hex!(pubkey, 64), *(ary or Array.new))
+          raise "Array expected: #{ary.inspect}" unless ary.is_a? Array
+          list.ref_pubkey(Nostr.hex!(pubkey, 64), *ary)
         }
         list
       end
       alias_method :follows, :contact_list
 
       def encrypted_text_message(content)
-        new_event(content, kind: :encrypted_text_message)
+        Event.new(content, kind: :encrypted_text_message, pubkey: @pubkey)
       end
       alias_method :direct_msg, :encrypted_text_message
     end

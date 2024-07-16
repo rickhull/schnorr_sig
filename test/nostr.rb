@@ -158,23 +158,21 @@ describe Nostr do
     end
   end
 
-  describe Nostr::User do
-    it "has a keypair (sk and pk)" do
-      u = Nostr::User.new
-      expect(u).must_be_kind_of Nostr::User
+  describe Nostr::Session do
+    it "requires a public key" do
+      pk = Random.bytes(32)
+      u = Nostr::Session.new(pk: pk)
+      expect(u).must_be_kind_of Nostr::Session
 
-      sk, pk = u.sk, u.pk
-      expect(sk).must_be_kind_of String
-      expect(sk.length).must_equal 32
+      pubkey = u.pubkey
+      expect(pubkey).must_be_kind_of String
+      expect(pubkey.encoding).wont_equal Encoding::BINARY
+      expect(pubkey.length).must_equal 64
+
+      pk = u.pk
       expect(pk).must_be_kind_of String
+      expect(pk.encoding).must_equal Encoding::BINARY
       expect(pk.length).must_equal 32
-      expect(sk).wont_equal pk
-    end
-
-    it "provides a hex representation of the public key" do
-      u = Nostr::User.new
-      hex = u.pubkey
-      expect(Nostr.hex!(hex, 64)).must_equal hex
     end
   end
 end
