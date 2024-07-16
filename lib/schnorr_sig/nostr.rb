@@ -221,7 +221,7 @@ module SchnorrSig
     class User
       attr_reader :name, :about, :picture, :sk, :pk
 
-      def initialize(name:, about: '', picture: '', sk: nil, pk: nil)
+      def initialize(name, about: '', picture: '', sk: nil, pk: nil)
         @name = Nostr.string!(name)
         @about = Nostr.string!(about)
         @picture = Nostr.string!(picture)

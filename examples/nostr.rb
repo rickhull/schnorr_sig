@@ -3,7 +3,7 @@ require 'schnorr_sig/nostr'
 include SchnorrSig
 
 # keypair will be generated
-marge = Nostr::User.new(name: 'Marge')
+marge = Nostr::User.new('Marge')
 hello = marge.text_note('Good morning, Homie')
 
 puts "Marge Simpson: hello world, generated keypair"
@@ -22,7 +22,7 @@ puts
 #####
 
 # use our own secret key; pubkey will be generated
-homer = Nostr::User.new(name: 'Homer', about: 'Homer Jay Simpson',
+homer = Nostr::User.new('Homer', about: 'Homer Jay Simpson',
                         sk: Random.bytes(32))
 response = homer.text_note('Good morning, Marge')
 response.ref_event(hello.id)
@@ -69,7 +69,7 @@ puts
 
 # we'll "bring our own" keypair
 sk, pk = SchnorrSig.keypair
-bart = Nostr::User.new(name: 'Bart',
+bart = Nostr::User.new('Bart',
                        about: 'Bartholomew Jojo Simpson',
                        picture: 'https://upload.wikimedia.org/wikipedia/en/a/aa/Bart_Simpson_200px.png',
                        sk: sk, pk: pk)
@@ -95,7 +95,7 @@ puts
 puts "Lisa follows her family"
 puts
 
-lisa = Nostr::User.new(name: 'Lisa')
+lisa = Nostr::User.new('Lisa')
 # keys = [marge.pk, homer.pk, bart.pk
 following = lisa.contact_list({ marge.pubkey => [],
                                 homer.pubkey => [],
