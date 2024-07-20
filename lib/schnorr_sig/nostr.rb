@@ -132,13 +132,18 @@ module SchnorrSig
          @content]
       end
 
+      # JSON string, the array from serialize() above
+      def to_s
+        Nostr.json(self.serialize)
+      end
+
       # assign @digest, return 32 bytes binary
       def digest(memo: true)
         return @digest if memo and @digest # steep:ignore
 
         # we are creating or recreating the event
         @created_at = nil
-        @digest = Digest::SHA256.digest Nostr.json(self.serialize)
+        @digest = Digest::SHA256.digest(self.to_s)
       end
 
       # return 64 bytes of hexadecimal, ASCII encoded
@@ -210,11 +215,11 @@ module SchnorrSig
       end
     end
 
-
-    #
     #####################
     #
-
+    # A Device can create different types of events, implemented as instance
+    # methods. It can also handle incoming events, as a Nostr relay,
+    # implemented as class functions.
 
     class Device
       class Error < RuntimeError; end
@@ -256,6 +261,7 @@ module SchnorrSig
                     hash.fetch(:content),])
       end
 
+      # validate the id (optional) and signature
       def self.verify(json_str, check_id: true)
         h = self.hash(json_str)
 
