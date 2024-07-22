@@ -230,6 +230,7 @@ module SchnorrSig
       # this should correspond directly to Event#object_hash
       def self.hash(json_str)
         h = Nostr.parse(json_str)
+        raise(Error, "Hash expected") unless h.is_a? Hash
         %w[id pubkey created_at kind tags content sig].each { |key|
           v = h.fetch key
           case key
@@ -263,6 +264,7 @@ module SchnorrSig
                     hash.fetch(:content),])
       end
 
+      # steep:ignore:start
       # validate the id (optional) and signature
       def self.verify(json_str, check_id: true)
         h = self.hash(json_str)
@@ -281,6 +283,7 @@ module SchnorrSig
         end
         h
       end
+      # steep:ignore:end
 
       attr_reader :pubkey
 
