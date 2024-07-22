@@ -227,6 +227,7 @@ module SchnorrSig
       class SignatureCheck < Error; end
 
       # deconstruct and typecheck, return a ruby hash
+      # this should correspond directly to Event#object_hash
       def self.hash(json_str)
         h = Nostr.parse(json_str)
         %w[id pubkey created_at kind tags content sig].each { |key|
@@ -252,6 +253,7 @@ module SchnorrSig
       end
 
       # (re-)create the JSON array serialization
+      # this should correspond directly to Event#to_s (JSON array)
       def self.serialize(hash)
         Nostr.json([0,
                     hash.fetch(:pubkey),
