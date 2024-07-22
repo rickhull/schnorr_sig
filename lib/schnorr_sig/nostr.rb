@@ -286,7 +286,7 @@ module SchnorrSig
 
       def initialize(pubkey: nil, pk: nil)
         if pubkey
-          @pubkey = SchnorrSig.hex!(pubkey, 64)
+          @pubkey = Nostr.hex!(pubkey, 64)
         elsif pk
           @pubkey = SchnorrSig.bin2hex(Nostr.binary!(pk, 32))
         else
