@@ -335,7 +335,7 @@ msg = device.text_note('hello world')
 msg.sign(sk)
 
 # JSON string for transport, a NIP-01 Event
-json = msg.json_object
+json = msg.to_json
 
 # validate the transport string
 hash = Nostr::Device.verify(json)

@@ -22,7 +22,7 @@ puts
 hello.sign(marge_sk)
 
 puts "Event Object"
-puts hello.json_object
+puts hello.to_json
 puts
 
 #####
@@ -50,7 +50,7 @@ puts
 response.sign(homer_sk)
 
 puts "Event Object"
-puts response.json_object
+puts response.to_json
 puts
 
 #####
@@ -72,7 +72,7 @@ puts
 love_letter.sign(maggie_sk)
 
 puts "Event Object"
-puts love_letter.json_object
+puts love_letter.to_json
 puts
 
 #####
@@ -96,7 +96,7 @@ puts
 profile.sign(bart_sk)
 
 puts "Event Object"
-puts profile.json_object
+puts profile.to_json
 puts
 
 puts "Profile Content"
@@ -128,4 +128,4 @@ puts
 following.sign(lisa_sk)
 
 puts "Event Object"
-puts following.json_object
+puts following.to_json

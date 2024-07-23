@@ -58,9 +58,9 @@ module SchnorrSig
       def sign: (String secret_key) -> String
       def signed?: () -> bool
       def signed!: () -> bool
-      def sig: () -> String
-      def object_hash: () -> Hash[Symbol, values]
-      def json_object: () -> String
+      def sig: () -> String?
+      def to_h: () -> Hash[Symbol, values]
+      def to_json: () -> String
 
       def add_tag: (String tag, String value, *String rest) -> tags
       def ref_event: (String eid_hex, *String rest) -> tags

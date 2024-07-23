@@ -108,14 +108,12 @@ describe Nostr do
     it "checks whether the event has been signed" do
       e = new_event()
       expect(e.signed?).must_equal false
-      expect { e.signed! }.must_raise E::SignatureMissing
 
       e.sign(SK)
       expect(e.signed?).must_equal true
-      expect(e.signed!).must_equal true
     end
 
-    it "provides _sig_ as 128B of hex" do
+    it "provides sig() as 128B of hex" do
       e = new_event()
       e.sign(SK)
       sig = e.sig
@@ -124,23 +122,27 @@ describe Nostr do
       expect(sig.length).must_equal 128
     end
 
-    it "provides _object_hash_ as a Ruby hash, suitable for JSON conversion" do
+    it "provides to_h() as a Ruby hash, suitable for JSON conversion" do
       e = new_event()
-      expect { e.object_hash }.must_raise E::SignatureMissing
+      h = e.to_h
+      expect(h).must_be_kind_of Hash
+      expect(h[:id]).must_be_kind_of String
+      expect(h.key? :sig).must_equal false
 
       e.sign(SK)
-      h = e.object_hash
+      h = e.to_h
       expect(h).must_be_kind_of Hash
       expect(h).wont_be_empty
       expect(h.length).must_equal 7
+      expect(h[:sig]).must_be_kind_of String
     end
 
-    it "provides _json_object_ as a NIPS01 Event object, a string of JSON" do
+    it "provides to_json() as a NIPS01 Event object, a string of JSON" do
       e = new_event()
-      expect { e.json_object }.must_raise E::SignatureMissing
+      # expect { e.to_json }.must_raise E::SignatureMissing
 
       e.sign(SK)
-      j = e.json_object
+      j = e.to_json
 
       # id + pubkey + sig == 256 bytes
 

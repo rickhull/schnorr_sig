@@ -23,15 +23,14 @@ puts
 
 # msg is ready for delivery
 # relay receives JSON string
-json = msg.json_object
 puts "Relay receives:"
-puts json
+puts msg.to_json
 puts
 
 # verify the signature
 # if no errors raised, signature is verified
 # decompose into fields (Ruby hash buckets)
-hash = Device.verify(json)
+hash = Device.verify(msg.to_json)
 puts "Signature verified:"
 p hash
 puts
@@ -42,5 +41,5 @@ puts
 
 # send received json to the the destination
 puts "Relay sends:"
-puts json
+puts msg.to_json
 puts

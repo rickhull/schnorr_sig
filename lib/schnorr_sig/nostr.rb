@@ -151,6 +151,22 @@ module SchnorrSig
         SchnorrSig.bin2hex self.digest(memo: true)
       end
 
+      # return a Ruby hash, suitable for JSON conversion to NIPS01 Event object
+      def to_h
+        h = { id: self.id,
+              pubkey: @pubkey,
+              created_at: @created_at,
+              kind: @kind,
+              tags: @tags,
+              content: @content }
+        h[:sig] = self.sig.to_s if self.signed?
+        h
+      end
+
+      def to_json
+        self.signed? ? Nostr.json(self.to_h) : self.to_s
+      end
+
       # assign @signature, return 64 bytes binary
       def sign(secret_key)
         Nostr.binary!(secret_key, 32)
@@ -158,35 +174,12 @@ module SchnorrSig
       end
 
       def signed?
-        !!@signature and @signature.bytesize == 64 # steep:ignore
+        !!@signature
       end
 
-      def signed!
-        self.signed? or raise(SignatureMissing)
-      end
-
-      # steep:ignore:start
       # return 128 bytes of hexadecimal, ASCII encoded
       def sig
-        self.signed! and SchnorrSig.bin2hex(@signature)
-      end
-
-      # return a Ruby hash, suitable for JSON conversion to NIPS01 Event object
-      def object_hash
-        self.signed! and {
-          id: self.id,
-          pubkey: @pubkey,
-          created_at: @created_at,
-          kind: @kind,
-          tags: @tags,
-          content: @content,
-          sig: self.sig,
-        }
-      end
-      # steep:ignore:end
-
-      def json_object
-        Nostr.json(self.object_hash)
+        @signature and SchnorrSig.bin2hex(@signature.to_s)
       end
 
       # add an array of 2+ strings to @tags
@@ -227,7 +220,7 @@ module SchnorrSig
       class SignatureCheck < Error; end
 
       # deconstruct and typecheck, return a ruby hash
-      # this should correspond directly to Event#object_hash
+      # this should correspond directly to Event#to_h
       def self.hash(json_str)
         h = Nostr.parse(json_str)
         raise(Error, "Hash expected") unless h.is_a? Hash
