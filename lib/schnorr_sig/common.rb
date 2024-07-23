@@ -1,8 +1,8 @@
 module SchnorrSig
-  class InputError < RuntimeError; end
-  class SizeError < InputError; end
-  class TypeError < InputError; end
-  class EncodingError < InputError; end
+  class Error < RuntimeError; end
+  class SizeError < Error; end
+  class TypeError < Error; end
+  class EncodingError < Error; end
 
   # true or raise
   def self.integer!(i)
@@ -33,11 +33,9 @@ module SchnorrSig
   end
 
   # convert a binary string to a lowercase hex string
-  # steep:ignore:start
   def self.bin2hex(str)
-    str.unpack1('H*')
+    str.unpack1('H*').to_s
   end
-  # steep:ignore:end
 
   # convert a hex string to a binary string
   def self.hex2bin(hex)

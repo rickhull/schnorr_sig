@@ -1,16 +1,8 @@
 module SchnorrSig
-  class Error < RuntimeError
-  end
-
-  class BoundsError < Error
-  end
-
   class SanityCheck < Error
   end
-
   class VerifyFail < Error
   end
-
   class InfinityPoint < Error
   end
 

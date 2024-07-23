@@ -7,33 +7,36 @@ require 'digest'
 
 module SchnorrSig
   module Nostr
-    class Error < RuntimeError; end
-    class DeprecatedError < Error; end
-    class EncodingError < Error; end
-    class SizeError < Error; end
-
     # raise SchnorrSig::TypeError or return str
     def self.string!(str)
       SchnorrSig.string!(str) and str
     end
 
+    # raise SchnorrSig::TypeError or return int
+    def self.integer!(int)
+      SchnorrSig.integer!(int) and int
+    end
+
+    # raise SchnorrSig::TypeError or SchnorrSig::SizeError or return ary
+    def self.array!(ary, length = nil)
+      raise(TypeError, ary.class) unless ary.is_a?(Array)
+      raise(SizeError, ary.length) if length and length != ary.length
+      ary
+    end
+
     # raise (EncodingError, SizeError) or return str
     def self.binary!(str, length = nil)
-      string!(str)
+      SchnorrSig.string!(str)
       raise(EncodingError, str.encoding) if str.encoding != Encoding::BINARY
-      if length and length != str.bytesize
-        raise(SizeError, "#{length} : #{str.bytesize}")
-      end
+      raise(SizeError, str.length) if length and length != str.length
       str
     end
 
     # raise or return str
     def self.hex!(str, length = nil)
-      string!(str)
+      SchnorrSig.string!(str)
       raise(EncodingError, str.encoding) if str.encoding == Encoding::BINARY
-      if length and length != str.length
-        raise(SizeError, "#{length} : #{str.length}")
-      end
+      raise(SizeError, str.length) if length and length != str.length
       str
     end
 
@@ -61,10 +64,6 @@ module SchnorrSig
     end
 
     class Event
-      class Error < RuntimeError; end
-      class KeyError < Error; end
-      class SignatureMissing < Error; end
-
       # id: 64 hex chars (32B)
       # pubkey: 64 hex chars (32B)
       # created_at: unix seconds
@@ -102,12 +101,20 @@ module SchnorrSig
       def self.kind(val)
         case val
         when 2, :recommend_server
-          raise(DeprecatedError, "kind value 2")
+          raise(Error, "Deprecated: kind value 2")
         when Integer
           val
         else
           KINDS.fetch(val)
         end
+      end
+
+      def self.tags!(ary)
+        ary.each { |a|
+          raise(TypeError, a.inspect) unless a.is_a?(Array)
+          a.each { |s| Nostr.string! s }
+        }
+        ary
       end
 
       attr_reader :content, :kind, :created_at, :pubkey, :signature
@@ -139,7 +146,7 @@ module SchnorrSig
 
       # assign @digest, return 32 bytes binary
       def digest(memo: true)
-        return @digest if memo and @digest # steep:ignore
+        return @digest.to_s if memo and @digest
 
         # we are creating or recreating the event
         @created_at = nil
@@ -202,7 +209,7 @@ module SchnorrSig
       # kind: and one of [pubkey:, pk:] required
       def ref_replace(*rest, kind:, pubkey: nil, pk: nil, d_tag: '')
         raise(ArgumentError, "public key required") if pubkey.nil? and pk.nil?
-        pubkey ||= SchnorrSig.bin2hex(pk) # steep:ignore
+        pubkey ||= SchnorrSig.bin2hex(pk.to_s)
         val = [Event.kind(kind), Nostr.hex!(pubkey, 64), d_tag].join(':')
         add_tag('a', val, *rest)
       end
@@ -222,28 +229,16 @@ module SchnorrSig
       # deconstruct and typecheck, return a ruby hash
       # this should correspond directly to Event#to_h
       def self.hash(json_str)
-        h = Nostr.parse(json_str)
-        raise(Error, "Hash expected") unless h.is_a? Hash
-        %w[id pubkey created_at kind tags content sig].each { |key|
-          v = h.fetch key
-          case key
-          when "id", "pubkey", "content", "sig"
-            raise("expected String, got #{v.inspect}") unless v.is_a? String
-          when "tags"
-            raise("Expected Array, got #{v.inspect}") unless v.is_a? Array
-            v.each { |a|
-              raise("Expected Array, got #{a.inspect}") unless a.is_a? Array
-              a.each { |s|
-                raise("Expected String, got #{s.inspect}") if !s.is_a? String
-              }
-            }
-          when "created_at", "kind"
-            raise("Expected Integer, got #{v.inspect}") unless v.is_a? Integer
-          else
-            raise "unexpected"
-          end
+        j = Nostr.parse(json_str)
+        raise(Error, "Hash expected") unless j.is_a? Hash
+        { id:      Nostr.string!(j.fetch("id")),
+          pubkey:  Nostr.string!(j.fetch("pubkey")),
+          kind:                  j.fetch("kind"),
+          content: Nostr.string!(j.fetch("content")),
+          tags:      Event.tags!(j.fetch("tags")),
+          created_at:            j.fetch("created_at"),
+          sig:     Nostr.string!(j.fetch("sig")),
         }
-        h.transform_keys(&:to_sym)
       end
 
       # (re-)create the JSON array serialization
@@ -257,7 +252,6 @@ module SchnorrSig
                     hash.fetch(:content),])
       end
 
-      # steep:ignore:start
       # validate the id (optional) and signature
       def self.verify(json_str, check_id: true)
         h = self.hash(json_str)
@@ -276,7 +270,6 @@ module SchnorrSig
         end
         h
       end
-      # steep:ignore:end
 
       attr_reader :pubkey
 

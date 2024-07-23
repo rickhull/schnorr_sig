@@ -5,8 +5,6 @@ autoload :SecureRandom, 'securerandom' # stdlib
 # This implementation is based on the BIP340 spec: https://bips.xyz/340
 # re-open SchnorrSig to add more functions, errors, and constants
 module SchnorrSig
-  class Error < RuntimeError; end
-  class BoundsError < Error; end
   class SanityCheck < Error; end
   class VerifyFail < Error; end
   class InfinityPoint < Error; end
@@ -59,7 +57,7 @@ module SchnorrSig
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
     d0 = int(sk)
-    raise(BoundsError, "d0") if !d0.positive? or d0 >= N
+    raise(SizeError, "d0") if !d0.positive? or d0 >= N
 
     # BIP340: Let P = d' . G
     p = point(d0) # this is a point on the elliptic curve
@@ -77,7 +75,7 @@ module SchnorrSig
     # BIP340: Let k' = int(rand) mod n
     # BIP340: Fail if k' = 0
     k0 = int(nonce) % N
-    raise(BoundsError, "k0") if !k0.positive?
+    raise(SizeError, "k0") if !k0.positive?
 
     # BIP340: Let R = k' . G
     r = point(k0) # this is a point on the elliptic curve
@@ -130,11 +128,11 @@ module SchnorrSig
 
     # BIP340: Let r = int(sig[0:32]) fail if r >= p
     r = int(sig[0..B-1]) # steep:ignore
-    raise(BoundsError, "r >= p") if r >= P
+    raise(SizeError, "r >= p") if r >= P
 
     # BIP340: Let s = int(sig[32:64]); fail if s >= n
     s = int(sig[B..-1])  # steep:ignore
-    raise(BoundsError, "s >= n") if s >= N
+    raise(SizeError, "s >= n") if s >= N
 
     # BIP340:
     #   Let e = int(hash[BIP0340/challenge](bytes(r) || bytes(P) || m)) mod n
@@ -161,7 +159,7 @@ module SchnorrSig
     integer!(x)
 
     # BIP340: Fail if x >= p
-    raise(BoundsError, "x") if x >= P or x <= 0
+    raise(SizeError, "x") if x >= P or x <= 0
 
     # BIP340: Let c = x^3 + 7 mod p
     c = (x.pow(3, P) + 7) % P
@@ -189,7 +187,7 @@ module SchnorrSig
     # BIP340: Fail if d' = 0 or d' >= n
     # BIP340: Return bytes(d' . G)
     d0 = int(sk)
-    raise(BoundsError, "d0") if !d0.positive? or d0 >= N
+    raise(SizeError, "d0") if !d0.positive? or d0 >= N
     bytes(point(d0))
   end
 

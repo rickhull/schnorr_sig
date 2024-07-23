@@ -11,23 +11,33 @@ describe Nostr do
     end
 
     it "asserts an expected binary string is actually binary" do
-      expect { Nostr.binary!('asdf') }.must_raise Nostr::EncodingError
+      expect { Nostr.binary!('asdf') }.must_raise SchnorrSig::EncodingError
       expect(Nostr.binary!('asdf'.b)).must_equal 'asdf'.b
     end
 
     it "optionally asserts the length of an expected binary string" do
-      expect { Nostr.binary!("\x00".b, 2) }.must_raise Nostr::SizeError
+      expect { Nostr.binary!("\x00".b, 2) }.must_raise SchnorrSig::SizeError
       expect(Nostr.binary!("\x00".b, 1)).must_equal "\x00".b
     end
 
     it "asserts an expected hex string is not actually binary" do
-      expect { Nostr.hex!('abcd'.b) }.must_raise Nostr::EncodingError
+      expect { Nostr.hex!('abcd'.b) }.must_raise SchnorrSig::EncodingError
       expect(Nostr.hex!('abcd')).must_equal 'abcd'
     end
 
     it "optionally asserts the length of an expected hex string" do
-      expect { Nostr.hex!("00", 1) }.must_raise Nostr::SizeError
+      expect { Nostr.hex!("00", 1) }.must_raise SchnorrSig::SizeError
       expect(Nostr.hex!("00", 2)).must_equal "00"
+    end
+
+    it "asserts an expected integer is actually an integer" do
+      expect { Nostr.integer!("1") }.must_raise SchnorrSig::TypeError
+      expect(Nostr.integer!(1234)).must_be_kind_of Integer
+    end
+
+    it "asserts an expected array is actually an array" do
+      expect { Nostr.array!(Hash.new) }.must_raise SchnorrSig::TypeError
+      expect(Nostr.array!([1,2,3,4])).must_be_kind_of Array
     end
 
     it "parses a JSON string to a Ruby object" do
@@ -53,8 +63,8 @@ describe Nostr do
         expect(E.kind(:set_metadata)).must_equal 0
         expect(E.kind(1)).must_equal 1
         expect(E.kind(:text_note)).must_equal 1
-        expect { E.kind(2) }.must_raise Nostr::DeprecatedError
-        expect { E.kind(:recommend_server) }.must_raise Nostr::DeprecatedError
+        expect { E.kind(2) }.must_raise E::Error
+        expect { E.kind(:recommend_server) }.must_raise E::Error
         expect(E.kind(:contact_list)).must_equal 3
         expect(E.kind(:encrypted_direct_message)).must_equal 4
         expect(E.kind(5)).must_equal 5

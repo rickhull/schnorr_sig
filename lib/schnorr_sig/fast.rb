@@ -4,7 +4,6 @@ require 'rbsecp256k1'        # gem, C extension
 # re-open SchnorrSig to add more functions, errors, and constants
 module SchnorrSig
   CONTEXT = Secp256k1::Context.create
-  Error = Secp256k1::Error # enable: rescue SchnorrSig::Error
   FORCE_32_BYTE_MSG = true
 
   # Input
