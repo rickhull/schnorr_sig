@@ -13,13 +13,17 @@ module SchnorrSig
 
     class Event
       type tags = Array[Array[String]]
-      type values = String | Integer | tags
+      type hash = {
+        id: String,
+        pubkey: String,
+        content: String,
+        sig: String,
+        tags: Event::tags,
+        created_at: Integer,
+        kind: Integer
+      }
 
-      class Error < RuntimeError
-      end
-      class KeyError < Error
-      end
-      class TypeError < Error
+      class FrozenError < RuntimeError
       end
 
       KINDS: Hash[Symbol, Integer]
@@ -53,7 +57,7 @@ module SchnorrSig
       def signed?: () -> bool
       def signed!: () -> bool
       def sig: () -> String?
-      def to_h: () -> Hash[Symbol, values]
+      def to_h: () -> hash
       def to_json: () -> String
 
       def add_tag: (String tag, String value, *String rest) -> tags
@@ -64,16 +68,6 @@ module SchnorrSig
     end
 
     class Device
-      type hash = {
-        id: String,
-        pubkey: String,
-        content: String,
-        sig: String,
-        tags: Event::tags,
-        created_at: Integer,
-        kind: Integer
-      }
-
       class Error < RuntimeError
       end
       class IdCheck < Error
@@ -81,9 +75,9 @@ module SchnorrSig
       class SignatureCheck < Error
       end
 
-      def self.hash: (String json_str) -> hash
-      def self.serialize: (hash hash) -> String
-      def self.verify: (String json_str, ?check_id: bool) -> hash
+      def self.hash: (String json_str) -> Event::hash
+      def self.serialize: (Event::hash hash) -> String
+      def self.verify: (String json_str, ?check_id: bool) -> Event::hash
 
       @pubkey: String
       attr_reader pubkey: String

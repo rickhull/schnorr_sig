@@ -137,14 +137,14 @@ describe Nostr do
       h = e.to_h
       expect(h).must_be_kind_of Hash
       expect(h[:id]).must_be_kind_of String
-      expect(h.key? :sig).must_equal false
+      expect(h[:sig]).must_be_empty
 
       e.sign(SK)
       h = e.to_h
       expect(h).must_be_kind_of Hash
       expect(h).wont_be_empty
       expect(h.length).must_equal 7
-      expect(h[:sig]).must_be_kind_of String
+      expect(h[:sig]).wont_be_empty
     end
 
     it "provides to_json() as a NIPS01 Event object, a string of JSON" do

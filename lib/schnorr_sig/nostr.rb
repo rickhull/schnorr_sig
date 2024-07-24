@@ -64,6 +64,8 @@ module SchnorrSig
     end
 
     class Event
+      class FrozenError < RuntimeError; end
+
       # id: 64 hex chars (32B)
       # pubkey: 64 hex chars (32B)
       # created_at: unix seconds
@@ -109,10 +111,10 @@ module SchnorrSig
         end
       end
 
+      # Array[Array[String]]
       def self.tags!(ary)
-        ary.each { |a|
-          raise(TypeError, a.inspect) unless a.is_a?(Array)
-          a.each { |s| Nostr.string! s }
+        Nostr.array!(ary).each { |a|
+          Nostr.array!(a).each { |s| Nostr.string! s }
         }
         ary
       end
@@ -160,24 +162,24 @@ module SchnorrSig
 
       # return a Ruby hash, suitable for JSON conversion to NIPS01 Event object
       def to_h
-        h = { id: self.id,
-              pubkey: @pubkey,
-              created_at: @created_at,
-              kind: @kind,
-              tags: @tags,
-              content: @content }
-        h[:sig] = self.sig.to_s if self.signed?
-        h
+        { id: self.id,
+          pubkey: @pubkey,
+          created_at: @created_at,
+          kind: @kind,
+          tags: @tags,
+          content: @content,
+          sig: self.sig.to_s }
       end
 
       def to_json
-        self.signed? ? Nostr.json(self.to_h) : self.to_s
+        signed? ? Nostr.json(self.to_h) : self.to_s
       end
 
       # assign @signature, return 64 bytes binary
+      # signing will reset created_at and thus the digest / id
       def sign(secret_key)
-        Nostr.binary!(secret_key, 32)
-        @signature = SchnorrSig.sign(secret_key, self.digest(memo: false))
+        @signature = SchnorrSig.sign(Nostr.binary!(secret_key, 32),
+                                     self.digest(memo: false))
       end
 
       def signed?
@@ -191,6 +193,7 @@ module SchnorrSig
 
       # add an array of 2+ strings to @tags
       def add_tag(tag, value, *rest)
+        raise(FrozenError) if signed?
         @digest = nil # invalidate any prior digest
         @tags.push([Nostr.string!(tag), Nostr.string!(value)] +
                    rest.each { |s| Nostr.string!(s) })
