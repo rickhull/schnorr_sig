@@ -163,11 +163,11 @@ describe Nostr do
     end
   end
 
-  describe Nostr::Device do
+  describe Nostr::Source do
     it "requires a public key" do
       pk = Random.bytes(32)
-      u = Nostr::Device.new(pk: pk)
-      expect(u).must_be_kind_of Nostr::Device
+      u = Nostr::Source.new(pk: pk)
+      expect(u).must_be_kind_of Nostr::Source
 
       pubkey = u.pubkey
       expect(pubkey).must_be_kind_of String

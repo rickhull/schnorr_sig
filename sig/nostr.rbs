@@ -23,12 +23,23 @@ module SchnorrSig
         kind: Integer
       }
 
-      class FrozenError < RuntimeError
+      class Error < RuntimeError
       end
+      class FrozenError < Error
+      end
+      class IdCheck < Error
+      end
+      class SignatureCheck < Error
+      end
+
 
       KINDS: Hash[Symbol, Integer]
       def self.kind: ((Integer | Symbol) val) -> Integer
       def self.tags!: (Array[untyped]) -> Array[Array[String]]
+
+      def self.hash: (String json_str) -> hash
+      def self.serialize: (hash hash) -> String
+      def self.verify: (String json_str, ?check_id: bool) -> hash
 
       @content: String
       @kind: Integer
@@ -67,18 +78,7 @@ module SchnorrSig
         ?pubkey: String?, ?pk: String?, ?d_tag: String) -> tags
     end
 
-    class Device
-      class Error < RuntimeError
-      end
-      class IdCheck < Error
-      end
-      class SignatureCheck < Error
-      end
-
-      def self.hash: (String json_str) -> Event::hash
-      def self.serialize: (Event::hash hash) -> String
-      def self.verify: (String json_str, ?check_id: bool) -> Event::hash
-
+    class Source
       @pubkey: String
       attr_reader pubkey: String
 

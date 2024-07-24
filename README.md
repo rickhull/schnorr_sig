@@ -312,7 +312,7 @@ See https://github.com/etscrivner/rbsecp256k1/issues/80
 
 # Nostr
 
-A minimal Nostr implementation is provided.  A `Nostr::Device` can create
+A minimal Nostr implementation is provided.  A `Nostr::Source` can create
 [NIP-01](https://github.com/nostr-protocol/nips/blob/master/01.md) Events,
 which can be used for messaging, follows, profiles, etc.
 Events are signed with Schnorr signatures:
@@ -326,7 +326,7 @@ include SchnorrSig
 sk, pk = SchnorrSig.keypair
 
 # initiate a device with the public key
-device = Nostr::Device.new(pk: pk)
+device = Nostr::Source.new(pk: pk)
 
 # create a message
 msg = device.text_note('hello world')

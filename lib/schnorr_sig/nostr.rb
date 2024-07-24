@@ -267,11 +267,10 @@ module SchnorrSig
 
     #####################
     #
-    # A Device can create different types of events, implemented as instance
-    # methods. It can also handle incoming events, as a Nostr relay,
-    # implemented as class functions.
+    # A Source holds a public key and creates Events.
+    #
 
-    class Device
+    class Source
       attr_reader :pubkey
 
       def initialize(pubkey: nil, pk: nil)
@@ -290,7 +289,7 @@ module SchnorrSig
 
       # returns an Event, kind: 1, text_note
       def text_note(content)
-        Event.new(content, kind: :text_note, pubkey: @pubkey)
+        Event.new(Nostr.string!(content), kind: :text_note, pubkey: @pubkey)
       end
 
       # Input
@@ -318,15 +317,16 @@ module SchnorrSig
       def contact_list(pubkey_hsh)
         list = Event.new('', kind: :contact_list, pubkey: @pubkey)
         pubkey_hsh.each { |pubkey, ary|
-          raise "Array expected: #{ary.inspect}" unless ary.is_a? Array
-          list.ref_pubkey(Nostr.hex!(pubkey, 64), *ary)
+          list.ref_pubkey(Nostr.hex!(pubkey, 64), *Nostr.array!(ary))
         }
         list
       end
       alias_method :follows, :contact_list
 
       def encrypted_text_message(content)
-        Event.new(content, kind: :encrypted_text_message, pubkey: @pubkey)
+        Event.new(Nostr.string!(content),
+                  kind: :encrypted_text_message,
+                  pubkey: @pubkey)
       end
       alias_method :direct_msg, :encrypted_text_message
     end

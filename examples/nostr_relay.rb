@@ -3,7 +3,7 @@ require 'schnorr_sig/nostr'
 include SchnorrSig::Nostr
 
 sk, pk = SchnorrSig.keypair
-source = Device.new(pk: pk)
+source = Source.new(pk: pk)
 
 puts "Public key:"
 puts source.pubkey

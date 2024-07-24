@@ -8,7 +8,7 @@ pubkeys = {}
 marge_sk, pk = SchnorrSig.keypair
 
 # create a message using the public key
-marge = Nostr::Device.new(pk: pk)
+marge = Nostr::Source.new(pk: pk)
 hello = marge.text_note('Good morning, Homie')
 
 puts "Marge Simpson: hello world"
@@ -32,7 +32,7 @@ homer_sk = Random.bytes(32)
 pk = SchnorrSig.pubkey(homer_sk)
 
 # create a message using the public key
-homer = Nostr::Device.new(pk: pk)
+homer = Nostr::Source.new(pk: pk)
 response = homer.text_note('Good morning, Marge')
 
 # reference an earlier message
@@ -56,7 +56,7 @@ puts
 #####
 
 maggie_sk, pk = SchnorrSig.keypair
-maggie = Nostr::Device.new(pk: pk)
+maggie = Nostr::Source.new(pk: pk)
 
 puts
 puts "Maggie: love letter, ref Marge's pubkey"
@@ -83,7 +83,7 @@ puts
 
 
 bart_sk, bart_pk = SchnorrSig.keypair
-bart = Nostr::Device.new(pk: pk)
+bart = Nostr::Source.new(pk: pk)
 profile = bart.set_metadata(name: 'Bart',
                             about: 'Bartholomew Jojo Simpson',
                             picture: 'https://upload.wikimedia.org' +
@@ -110,7 +110,7 @@ puts "Lisa follows her family"
 puts
 
 lisa_sk, pk = SchnorrSig.keypair
-lisa = Nostr::Device.new(pk: pk)
+lisa = Nostr::Source.new(pk: pk)
 
 pubkey_hsh = {
   marge.pubkey => ["wss://thesimpsons.com/", "marge"],
