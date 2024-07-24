@@ -30,13 +30,13 @@ puts
 # verify the signature
 # if no errors raised, signature is verified
 # decompose into fields (Ruby hash buckets)
-hash = Device.verify(msg.to_json)
+hash = Event.verify(msg.to_json)
 puts "Signature verified:"
 p hash
 puts
 
 puts "Relay serialization:"
-puts Device.serialize(hash)
+puts Event.serialize(hash)
 puts
 
 # send received json to the the destination

@@ -338,7 +338,7 @@ msg.sign(sk)
 json = msg.to_json
 
 # validate the transport string
-hash = Nostr::Device.verify(json)
+hash = Nostr::Event.verify(json)
 
 # =>
 {:id=>"ed8ea4215c99f4ca1146052cf2efe4c808537eec65d1cb97e0ff68f2ab8fcf51",

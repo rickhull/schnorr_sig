@@ -64,7 +64,10 @@ module SchnorrSig
     end
 
     class Event
-      class FrozenError < RuntimeError; end
+      class Error < RuntimeError; end
+      class FrozenError < Error; end
+      class IdCheck < Error; end
+      class SignatureCheck < Error; end
 
       # id: 64 hex chars (32B)
       # pubkey: 64 hex chars (32B)
@@ -117,6 +120,50 @@ module SchnorrSig
           Nostr.array!(a).each { |s| Nostr.string! s }
         }
         ary
+      end
+
+      # deconstruct and typecheck, return a ruby hash
+      # this should correspond directly to Event#to_h
+      def self.hash(json_str)
+        j = Nostr.parse(json_str)
+        raise(Error, "Hash expected: #{j.inspect}") unless j.is_a? Hash
+        { id:      Nostr.string!(j.fetch("id")),
+          pubkey:  Nostr.string!(j.fetch("pubkey")),
+          kind:                  j.fetch("kind"),
+          content: Nostr.string!(j.fetch("content")),
+          tags:      Event.tags!(j.fetch("tags")),
+          created_at:            j.fetch("created_at"),
+          sig:     Nostr.string!(j.fetch("sig")), }
+      end
+
+      # (re-)create the JSON array serialization
+      # this should correspond directly to Event#to_s (JSON array)
+      def self.serialize(hash)
+        Nostr.json([0,
+                    hash.fetch(:pubkey),
+                    hash.fetch(:created_at),
+                    hash.fetch(:kind),
+                    hash.fetch(:tags),
+                    hash.fetch(:content),])
+      end
+
+      # validate the id (optional) and signature
+      def self.verify(json_str, check_id: true)
+        h = self.hash(json_str)
+
+        # check the id
+        id = SchnorrSig.hex2bin(h.fetch(:id))
+        if check_id and id != Digest::SHA256.digest(self.serialize(h))
+          raise(IdCheck, h.fetch(:id))
+        end
+
+        # verify the signature
+        unless SchnorrSig.verify?(SchnorrSig.hex2bin(h.fetch(:pubkey)),
+                                  id,
+                                  SchnorrSig.hex2bin(h.fetch(:sig)))
+          raise(SignatureCheck, h[:sig])
+        end
+        h
       end
 
       attr_reader :content, :kind, :created_at, :pubkey, :signature
@@ -225,55 +272,6 @@ module SchnorrSig
     # implemented as class functions.
 
     class Device
-      class Error < RuntimeError; end
-      class IdCheck < Error; end
-      class SignatureCheck < Error; end
-
-      # deconstruct and typecheck, return a ruby hash
-      # this should correspond directly to Event#to_h
-      def self.hash(json_str)
-        j = Nostr.parse(json_str)
-        raise(Error, "Hash expected") unless j.is_a? Hash
-        { id:      Nostr.string!(j.fetch("id")),
-          pubkey:  Nostr.string!(j.fetch("pubkey")),
-          kind:                  j.fetch("kind"),
-          content: Nostr.string!(j.fetch("content")),
-          tags:      Event.tags!(j.fetch("tags")),
-          created_at:            j.fetch("created_at"),
-          sig:     Nostr.string!(j.fetch("sig")),
-        }
-      end
-
-      # (re-)create the JSON array serialization
-      # this should correspond directly to Event#to_s (JSON array)
-      def self.serialize(hash)
-        Nostr.json([0,
-                    hash.fetch(:pubkey),
-                    hash.fetch(:created_at),
-                    hash.fetch(:kind),
-                    hash.fetch(:tags),
-                    hash.fetch(:content),])
-      end
-
-      # validate the id (optional) and signature
-      def self.verify(json_str, check_id: true)
-        h = self.hash(json_str)
-
-        # check the id
-        id = SchnorrSig.hex2bin(h.fetch(:id))
-        if check_id and id != Digest::SHA256.digest(self.serialize(h))
-          raise(IdCheck, h.fetch(:id))
-        end
-
-        # verify the signature
-        unless SchnorrSig.verify?(SchnorrSig.hex2bin(h.fetch(:pubkey)),
-                                  id,
-                                  SchnorrSig.hex2bin(h.fetch(:sig)))
-          raise(SignatureCheck, h[:sig])
-        end
-        h
-      end
-
       attr_reader :pubkey
 
       def initialize(pubkey: nil, pk: nil)
