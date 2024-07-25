@@ -7,6 +7,11 @@ require 'digest'
 
 module SchnorrSig
   module Nostr
+
+    #
+    # Type Enforcement
+    #
+
     # raise SchnorrSig::TypeError or return str
     def self.string!(str)
       SchnorrSig.string!(str) and str
@@ -24,7 +29,15 @@ module SchnorrSig
       ary
     end
 
-    # raise (EncodingError, SizeError) or return str
+    # Array[Array[String]]
+    # may raise SchnorrSig::TypeError
+    def self.tags!(ary)
+      Nostr.array!(ary).each { |a|
+        Nostr.array!(a).each { |s| Nostr.string! s }
+      }
+    end
+
+    # raise (SchnorrSig::EncodingError, SchnorrSig::SizeError) or return str
     def self.binary!(str, length = nil)
       SchnorrSig.string!(str)
       raise(EncodingError, str.encoding) if str.encoding != Encoding::BINARY
@@ -32,13 +45,17 @@ module SchnorrSig
       str
     end
 
-    # raise or return str
+    # raise (SchnorrSig::EncodingError, SchnorrSig::SizeError) or return str
     def self.hex!(str, length = nil)
       SchnorrSig.string!(str)
       raise(EncodingError, str.encoding) if str.encoding == Encoding::BINARY
       raise(SizeError, str.length) if length and length != str.length
       str
     end
+
+    #
+    # JSON I/O
+    #
 
     # per NIP-01
     JSON_OPTIONS = {
@@ -63,21 +80,28 @@ module SchnorrSig
       JSON.generate(object, **JSON_OPTIONS)
     end
 
+    #
+    # Event Class, per NIP-01
+    #
+
     class Event
       class Error < RuntimeError; end
+      class TypeError < Error; end
+      class DeprecatedError < Error; end
+      class BoundsError < Error; end
       class FrozenError < Error; end
       class IdCheck < Error; end
       class SignatureCheck < Error; end
 
-      # id: 64 hex chars (32B)
-      # pubkey: 64 hex chars (32B)
-      # created_at: unix seconds
+      # id: 64 hex chars (32B binary)
+      # pubkey: 64 hex chars (32B binary)
+      # created_at: unix seconds, integer
       # kind: 0..65535
-      # tags: []
+      # tags: Array[Array[string]]
       # content: any string
-      # sig: 128 hex chars (64B)
+      # sig: 128 hex chars (64B binary)
 
-      # the id is a SHA256 of the serialized event:
+      # the id is a SHA256 digest of the serialized event:
       # [
       #   0,
       #   <pubkey, lowercase hex>,
@@ -87,13 +111,15 @@ module SchnorrSig
       #   <content>
       # ]
 
-      # 1. using public key:
-      # 1a. generate content: String
-      # 1b. set kind: Integer
-      # 1c. set tags: Array
-      # 2. timestamp: Integer
-      # 3. generate id: SHA256
-      # 4. sign(sk): 64B
+      # Event Creation
+      # ---
+      # 1. with public key, set:
+      # 1a. content: String ('')
+      # 1b. kind: Integer (1)
+      # 1c. tags: Array ([])
+      # 2. timestamp: Integer, unix timestamp
+      # 3. generate id: SHA256, 32B binary, 64B hex
+      # 4. sign(secret_key): 64B binary, 128B hex
 
       KINDS = {
         set_metadata: 0,
@@ -103,41 +129,40 @@ module SchnorrSig
         encrypted_direct_message: 4,
       }
 
+      # convert Symbol or integer to valid integer, or raise various Errors
       def self.kind(val)
         case val
         when 2, :recommend_server
-          raise(Error, "Deprecated: kind value 2")
+          raise(DeprecatedError, "Deprecated: kind value 2")
         when Integer
+          raise(BoundsError, val.inspect) unless (0..65535).include?(val)
           val
-        else
+        when Symbol
           KINDS.fetch(val)
+        else
+          raise(TypeError, val.inspect)
         end
-      end
-
-      # Array[Array[String]]
-      def self.tags!(ary)
-        Nostr.array!(ary).each { |a|
-          Nostr.array!(a).each { |s| Nostr.string! s }
-        }
-        ary
       end
 
       # deconstruct and typecheck, return a ruby hash
       # this should correspond directly to Event#to_h
+      # may raise TypeError (expecting JSON hash/object)
+      # may raise KeyError on Hash#fetch
       def self.hash(json_str)
         j = Nostr.parse(json_str)
-        raise(Error, "Hash expected: #{j.inspect}") unless j.is_a? Hash
-        { id:      Nostr.string!(j.fetch("id")),
-          pubkey:  Nostr.string!(j.fetch("pubkey")),
-          kind:                  j.fetch("kind"),
-          content: Nostr.string!(j.fetch("content")),
-          tags:      Event.tags!(j.fetch("tags")),
-          created_at:            j.fetch("created_at"),
-          sig:     Nostr.string!(j.fetch("sig")), }
+        raise(TypeError, "Hash expected: #{j.inspect}") unless j.is_a? Hash
+        { id:          Nostr.string!(j.fetch("id")),
+          pubkey:      Nostr.string!(j.fetch("pubkey")),
+          kind:       Nostr.integer!(j.fetch("kind")),
+          content:     Nostr.string!(j.fetch("content")),
+          tags:          Nostr.tags!(j.fetch("tags")),
+          created_at: Nostr.integer!(j.fetch("created_at")),
+          sig:         Nostr.string!(j.fetch("sig")), }
       end
 
-      # (re-)create the JSON array serialization
-      # this should correspond directly to Event#to_s (JSON array)
+      # create JSON array serialization
+      # this should correspond directly to Event#serialize and Event#to_s
+      # may raise KeyError on Hash#fetch
       def self.serialize(hash)
         Nostr.json([0,
                     hash.fetch(:pubkey),
@@ -148,6 +173,7 @@ module SchnorrSig
       end
 
       # validate the id (optional) and signature
+      # may raise IdCheck and SignatureCheck
       def self.verify(json_str, check_id: true)
         h = self.hash(json_str)
 
@@ -265,7 +291,6 @@ module SchnorrSig
       end
     end
 
-    #####################
     #
     # A Source holds a public key and creates Events.
     #
@@ -323,6 +348,7 @@ module SchnorrSig
       end
       alias_method :follows, :contact_list
 
+      # TODO: WIP, DONTUSE
       def encrypted_text_message(content)
         Event.new(Nostr.string!(content),
                   kind: :encrypted_text_message,
