@@ -1,5 +1,7 @@
 module SchnorrSig
   module Nostr
+    type coll = Hash[untyped, untyped] | Array[untyped]
+
     def self.string!: (untyped str) -> String
     def self.integer!: (untyped int) -> Integer
     def self.array!: (untyped ary, ?Integer? length) -> Array[untyped]
@@ -9,8 +11,8 @@ module SchnorrSig
 
     JSON_OPTIONS: Hash[Symbol, bool | String | Integer]
 
-    def self.parse: (String json) -> (Hash[untyped, untyped] | Array[untyped])
-    def self.json: ((Hash[untyped, untyped] | Array[untyped]) object) -> String
+    def self.parse: (String json) -> coll
+    def self.json: (coll object) -> String
 
     class Event
       type tags = Array[Array[String]]

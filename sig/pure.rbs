@@ -1,4 +1,7 @@
 module SchnorrSig
+  type ec_group = untyped
+  type ec_point = untyped
+
   class SanityCheck < Error
   end
   class VerifyFail < Error
@@ -6,20 +9,20 @@ module SchnorrSig
   class InfinityPoint < Error
   end
 
-  GROUP: untyped # ECDSA::Group
+  GROUP: ec_group
   P: Integer
   N: Integer
   B: Integer
 
-  def self.point: (Integer int) -> untyped # ECDSA::Point
-  def self.select_even_y: (untyped point, Integer even_val) -> Integer
+  def self.point: (Integer int) -> ec_point
+  def self.select_even_y: (ec_point point, Integer even_val) -> Integer
   alias self.int self.bin2big
   def self.bytes: (Integer val) -> String
 
   def self.sign: (String sk, String m, ?String a) -> String
   def self.tagged_hash: (String tag, String msg) -> String
   def self.verify?: (String pk, String m, String sig) -> bool
-  def self.lift_x: (Integer x) -> untyped # ECDSA::Point
+  def self.lift_x: (Integer x) -> ec_point
   def self.pubkey: (String sk) -> String
   def self.keypair: () -> [String, String]
   def self.secure_keypair: () -> [String, String]
