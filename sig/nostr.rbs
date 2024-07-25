@@ -21,7 +21,7 @@ module SchnorrSig
         pubkey: String,
         content: String,
         sig: String,
-        tags: Event::tags,
+        tags: tags,
         created_at: Integer,
         kind: Integer
       }
@@ -64,25 +64,27 @@ module SchnorrSig
 
       def initialize: (?String content,
                        pubkey: String,
-		       ?kind: Integer | Symbol) -> void
+                       ?kind: Integer | Symbol) -> void
 
-      def serialize: () -> [0, String, Integer, Integer,
-                            tags, String]
+      def serialize: () -> [0, String, Integer, Integer, tags, String]
       def to_s: () -> String
       def digest: (?memo: bool) -> String
       def id: () -> String
-      def sign: (String secret_key) -> String
-      def signed?: () -> bool
-      def signed!: () -> bool
-      def sig: () -> String?
       def to_h: () -> hash
       def to_json: () -> String
+
+      def sign: (String secret_key) -> String
+      def signed?: () -> bool
+      def sig: () -> String?
 
       def add_tag: (String tag, String value, *String rest) -> tags
       def ref_event: (String eid_hex, *String rest) -> tags
       def ref_pubkey: (String pk_hex, *String rest) -> tags
-      def ref_replace: (*String rest, kind: Integer,
-        ?pubkey: String?, ?pk: String?, ?d_tag: String) -> tags
+      def ref_replace: (*String rest,
+                        kind: Integer,
+                        ?pubkey: String?,
+                        ?pk: String?,
+                        ?d_tag: String) -> tags
     end
 
     class Source
@@ -90,17 +92,13 @@ module SchnorrSig
       attr_reader pubkey: String
 
       def initialize: (?pubkey: String?, ?pk: String?) -> void
-
       def pk: () -> String
 
-      def text_note: (String content) -> Nostr::Event
-
+      def text_note: (String content) -> Event
       def set_metadata: (**Hash[Symbol, String] kwargs) -> Event
       alias profile set_metadata
-
       def contact_list: (Hash[String, Array[String]] pubkey_hsh) -> Event
       alias follows contact_list
-
       def encrypted_text_message: (String content) -> Event
       alias direct_msg encrypted_text_message
     end
