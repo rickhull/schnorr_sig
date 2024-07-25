@@ -17,9 +17,7 @@ module SchnorrSig
   # true or raise
   def self.bytestring!(str, size)
     string!(str)
-    if str.encoding == Encoding::BINARY
-      raise(EncodingError, str[0..3].inspect)
-    end
+    raise(EncodingError, str[0..3].inspect) if str.encoding != Encoding::BINARY
     str.bytesize == size or raise(SizeError, str[0..3].inspect)
   end
 
