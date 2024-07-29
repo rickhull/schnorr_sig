@@ -5,7 +5,7 @@ module SchnorrSig
     def self.string!: (untyped str) -> String
     def self.integer!: (untyped int) -> Integer
     def self.array!: (untyped ary, ?Integer? length) -> Array[untyped]
-    def self.tags!: (Array[untyped]) -> Array[Array[String]]
+    def self.tags!: (Array[untyped]) -> Event::tags
     def self.binary!: (untyped str, ?Integer? length) -> String
     def self.hex!: (untyped str, ?Integer? length) -> String
 
