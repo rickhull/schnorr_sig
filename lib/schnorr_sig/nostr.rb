@@ -86,7 +86,6 @@ module SchnorrSig
 
     class Event
       class Error < RuntimeError; end
-      class TypeError < Error; end
       class DeprecatedError < Error; end
       class BoundsError < Error; end
       class FrozenError < Error; end
