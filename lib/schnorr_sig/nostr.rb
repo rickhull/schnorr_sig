@@ -148,15 +148,15 @@ module SchnorrSig
       # may raise TypeError (expecting JSON hash/object)
       # may raise KeyError on Hash#fetch
       def self.hash(json_str)
-        j = Nostr.parse(json_str)
-        raise(TypeError, "Hash expected: #{j.inspect}") unless j.is_a? Hash
-        { id:          Nostr.string!(j.fetch("id")),
-          pubkey:      Nostr.string!(j.fetch("pubkey")),
-          kind:       Nostr.integer!(j.fetch("kind")),
-          content:     Nostr.string!(j.fetch("content")),
-          tags:          Nostr.tags!(j.fetch("tags")),
-          created_at: Nostr.integer!(j.fetch("created_at")),
-          sig:         Nostr.string!(j.fetch("sig")), }
+        h = Nostr.parse(json_str)
+        raise(TypeError, "Hash expected: #{h.inspect}") unless h.is_a? Hash
+        { id:          Nostr.string!(h.fetch("id")),
+          pubkey:      Nostr.string!(h.fetch("pubkey")),
+          kind:       Nostr.integer!(h.fetch("kind")),
+          content:     Nostr.string!(h.fetch("content")),
+          tags:          Nostr.tags!(h.fetch("tags")),
+          created_at: Nostr.integer!(h.fetch("created_at")),
+          sig:         Nostr.string!(h.fetch("sig")), }
       end
 
       # create JSON array serialization
