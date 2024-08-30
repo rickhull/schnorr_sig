@@ -1,7 +1,12 @@
 require 'rake/testtask'
 
 Rake::TestTask.new :test do |t|
-  t.pattern = "test/*.rb"
+  t.test_files = [
+    'test/pure.rb',
+    'test/schnorr_sig.rb',
+    'test/vectors.rb',
+    'test/vectors_extra.rb',
+  ]
   t.warning = true
 end
 

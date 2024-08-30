@@ -1,4 +1,4 @@
-require 'schnorr_sig/common'
+require 'schnorr_sig'
 require 'minitest/autorun'
 
 describe SchnorrSig do

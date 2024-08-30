@@ -1,5 +1,5 @@
-require 'schnorr_sig/common'           # project
-require 'ecdsa_ext'                    # gem
+require 'schnorr_sig'
+require 'ecdsa_ext'                    # gem, depends on ecdsa gem
 autoload :SecureRandom, 'securerandom' # stdlib
 
 # This implementation is based on the BIP340 spec: https://bips.xyz/340
