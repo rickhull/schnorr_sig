@@ -1,3 +1,5 @@
+[![Tests Status](https://github.com/rickhull/schnorr_sig/actions/workflows/tests.yaml/badge.svg)](https://github.com/rickhull/schnorr_sig/actions/workflows/tests.yaml)
+
 # Schnorr Signatures
 
 This is a simple, minimal library written in Ruby for the purpose of
