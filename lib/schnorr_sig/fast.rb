@@ -12,7 +12,7 @@ module SchnorrSig
   # Output
   #   64 bytes binary
   def self.sign(sk, m)
-    bytestring!(sk, 32) and string!(m)
+    binary!(sk, 32) and check!(m, String)
     m = m[0..31].ljust(32, ' ') if FORCE_32_BYTE_MSG
     CONTEXT.sign_schnorr(key_pair(sk), m).serialized
   end
@@ -24,7 +24,7 @@ module SchnorrSig
   # Output
   #   Boolean, may raise SchnorrSig::Error
   def self.verify?(pk, m, sig)
-    bytestring!(pk, 32) and string!(m) and bytestring!(sig, 64)
+    binary!(pk, 32) and check!(m, String) and binary!(sig, 64)
     signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
   end
 
@@ -34,7 +34,7 @@ module SchnorrSig
   #   Secp256k1::KeyPair
   def self.key_pair(sk = nil)
     if sk
-      bytestring!(sk, 32)
+      binary!(sk, 32)
       CONTEXT.key_pair_from_private_key(sk)
     else
       CONTEXT.generate_key_pair
@@ -63,7 +63,7 @@ module SchnorrSig
   # Output
   #   Secp256k1::SchnorrSignature
   def self.signature(str)
-    bytestring!(str, 64)
+    binary!(str, 64)
     Secp256k1::SchnorrSignature.from_data(str)
   end
 end

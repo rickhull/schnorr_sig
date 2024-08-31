@@ -1,24 +1,18 @@
 module SchnorrSig
   class Error < RuntimeError; end
   class SizeError < Error; end
-  class TypeError < Error; end
-  class EncodingError < Error; end
 
-  # true or raise
-  def self.integer!(i)
-    i.is_a?(Integer) or raise(TypeError, [i, i.class].join(':'))
+  # raise TypeError or return val
+  def self.check!(val, cls)
+    val.is_a?(cls) ? val : raise(TypeError, "#{cls} expected: #{val.inspect}")
   end
 
-  # true or raise
-  def self.string!(str)
-    str.is_a?(String) or raise(TypeError, [str, str.class].join(':'))
-  end
-
-  # true or raise
-  def self.bytestring!(str, size)
-    string!(str)
-    raise(EncodingError, str[0..3].inspect) if str.encoding != Encoding::BINARY
-    str.bytesize == size or raise(SizeError, str[0..3].inspect)
+  # raise TypeError, EncodingError, or SizeError, or return str
+  def self.binary!(str, length)
+    check!(str, String)
+    raise(EncodingError, str.encoding) if str.encoding != Encoding::BINARY
+    raise(SizeError, str.length) if str.length != length
+    str
   end
 
   # likely returns a Bignum, larger than a 64-bit hardware integer

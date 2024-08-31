@@ -52,7 +52,7 @@ module SchnorrSig
   # Output
   #   The signature, sig:       64 bytes binary
   def self.sign(sk, m, a = Random.bytes(B))
-    bytestring!(sk, B) and string!(m) and bytestring!(a, B)
+    binary!(sk, B) and check!(m, String) and binary!(a, B)
 
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
@@ -103,7 +103,7 @@ module SchnorrSig
   # Output
   #   32 bytes binary
   def self.tagged_hash(tag, msg)
-    string!(tag) and string!(msg)
+    check!(tag, String) and check!(msg, String)
     warn("tag expected to be UTF-8") unless tag.encoding == Encoding::UTF_8
 
     # BIP340: The function hash[name](x) where x is a byte array
@@ -121,7 +121,7 @@ module SchnorrSig
   # Output
   #   Boolean
   def self.verify?(pk, m, sig)
-    bytestring!(pk, B) and string!(m) and bytestring!(sig, B * 2)
+    binary!(pk, B) and check!(m, String) and binary!(sig, B * 2)
 
     # BIP340: Let P = lift_x(int(pk))
     p = lift_x(int(pk))
@@ -156,7 +156,7 @@ module SchnorrSig
   # Output
   #   ECDSA::Point
   def self.lift_x(x)
-    integer!(x)
+    check!(x, Integer)
 
     # BIP340: Fail if x >= p
     raise(SizeError, "x") if x >= P or x <= 0
@@ -181,7 +181,7 @@ module SchnorrSig
   # Output
   #   32 bytes binary (represents P.x for point P on the curve)
   def self.pubkey(sk)
-    bytestring!(sk, B)
+    binary!(sk, B)
 
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
