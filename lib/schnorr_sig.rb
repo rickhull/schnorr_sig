@@ -2,6 +2,9 @@ module SchnorrSig
   class Error < RuntimeError; end
   class SizeError < Error; end
 
+  KEY = 32 # bytes
+  SIG = 64 # bytes
+
   # raise TypeError or return val
   def self.check!(val, cls)
     val.is_a?(cls) ? val : raise(TypeError, "#{cls} expected: #{val.inspect}")
@@ -28,7 +31,7 @@ module SchnorrSig
 
   # convert a binary string to a lowercase hex string
   def self.bin2hex(str)
-    str.unpack1('H*').to_s
+    str.unpack1('H*').to_s  # typechecker can't know unpack1 returns a string
   end
 
   # convert a hex string to a binary string

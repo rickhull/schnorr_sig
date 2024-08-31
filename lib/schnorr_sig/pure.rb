@@ -52,7 +52,7 @@ module SchnorrSig
   # Output
   #   The signature, sig:       64 bytes binary
   def self.sign(sk, m, a = Random.bytes(B))
-    binary!(sk, B) and check!(m, String) and binary!(a, B)
+    binary!(sk, KEY) and check!(m, String) and binary!(a, B)
 
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
@@ -121,17 +121,17 @@ module SchnorrSig
   # Output
   #   Boolean
   def self.verify?(pk, m, sig)
-    binary!(pk, B) and check!(m, String) and binary!(sig, B * 2)
+    binary!(pk, KEY) and check!(m, String) and binary!(sig, SIG)
 
     # BIP340: Let P = lift_x(int(pk))
     p = lift_x(int(pk))
 
     # BIP340: Let r = int(sig[0:32]) fail if r >= p
-    r = int(sig[0..B-1]) # steep:ignore
+    r = int(sig[0..KEY-1]) # steep:ignore
     raise(SizeError, "r >= p") if r >= P
 
     # BIP340: Let s = int(sig[32:64]); fail if s >= n
-    s = int(sig[B..-1])  # steep:ignore
+    s = int(sig[KEY..-1])  # steep:ignore
     raise(SizeError, "s >= n") if s >= N
 
     # BIP340:
@@ -181,7 +181,7 @@ module SchnorrSig
   # Output
   #   32 bytes binary (represents P.x for point P on the curve)
   def self.pubkey(sk)
-    binary!(sk, B)
+    binary!(sk, KEY)
 
     # BIP340: Let d' = int(sk)
     # BIP340: Fail if d' = 0 or d' >= n
@@ -193,13 +193,13 @@ module SchnorrSig
 
   # generate a new keypair based on random data
   def self.keypair
-    sk = Random.bytes(B)
+    sk = Random.bytes(KEY)
     [sk, pubkey(sk)]
   end
 
   # as above, but using SecureRandom
   def self.secure_keypair
-    sk = SecureRandom.bytes(B) # steep:ignore
+    sk = SecureRandom.bytes(KEY) # steep:ignore
     [sk, pubkey(sk)]
   end
 end
