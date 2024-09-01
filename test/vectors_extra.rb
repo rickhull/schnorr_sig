@@ -28,7 +28,11 @@ table.each { |row|
     pk_msg = (pubkey == pk) ? "pk match" : "pk mismatch"
 
     # calculate a signature
-    calc_sig = SchnorrSig.sign(sk, m)
+    begin
+      calc_sig = SchnorrSig.sign(sk, m)
+    rescue SchnorrSig::Error
+      calc_sig = "sig error"
+    end
     sig_msg = (calc_sig == sig) ? "sig match" : "sig mismatch"
   end
 
