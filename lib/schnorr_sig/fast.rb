@@ -33,6 +33,7 @@ module SchnorrSig
     strict_verify?(pk, m, sig) rescue false
   end
 
+  # This method is native to rbsecp256k1
   # Input
   #   (The secret key, sk: 32 bytes binary)
   # Output
@@ -46,12 +47,11 @@ module SchnorrSig
     end
   end
 
-  # Input
-  #   (The secret key, sk: 32 bytes binary)
+  # This method matches the pure.rb signature
   # Output
   #   [sk, pk]
-  def self.keypair(sk = nil)
-    kp = self.key_pair(sk)
+  def self.keypair
+    kp = self.key_pair
     [kp.private_key.data, kp.xonly_public_key.serialized]
   end
 
@@ -60,7 +60,7 @@ module SchnorrSig
   # Output
   #   The public key: 32 bytes binary
   def self.pubkey(sk)
-    keypair(sk)[1]
+    self.key_pair(sk).xonly_public_key.serialized
   end
 
   # Input
