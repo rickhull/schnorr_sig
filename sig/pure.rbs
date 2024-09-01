@@ -15,13 +15,17 @@ module SchnorrSig
   N: Integer
   B: Integer
 
-  def self.point: (Integer int) -> ec_point
-  def self.select_even_y: (ec_point point, Integer even_val) -> Integer
-  alias self.int self.bin2big
-  def self.bytes: (Integer val) -> String
-
-  def self.sign: (String sk, String m, ?String a) -> String
-  def self.tagged_hash: (String tag, String msg) -> String
-  def self.lift_x: (Integer x) -> ec_point
-  def self.secure_keypair: () -> [String, String]
+  module Pure
+    def random_bytes: (Integer count) -> String
+    def point: (Integer int) -> ec_point
+    def select_even_y: (ec_point point, Integer even_val) -> Integer
+    def int: (String x) -> Integer
+    def bytes: (Integer | ec_point val) -> String
+    def lift_x: (Integer x) -> ec_point
+    def tagged_hash: (String tag, String msg) -> String
+    def pubkey: (String sk) -> String
+    def keypair: -> [String, String]
+    def sign: (String sk, String m, ?auxrand: nil) -> String
+    def verify?: (String pk, String m, String sig) -> bool
+  end
 end

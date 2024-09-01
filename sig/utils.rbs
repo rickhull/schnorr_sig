@@ -1,0 +1,18 @@
+module SchnorrSig
+  class Error < RuntimeError
+  end
+  class SizeError < Error
+  end
+
+  KEY: 32
+  SIG: 64
+
+  module Utils
+    def check!: (untyped val, Class cls) -> untyped
+    def binary!: (String str, Integer length) -> String
+    def bin2big: (String str) -> Integer
+    def big2bin: (Integer bignum) -> String
+    def bin2hex: (String str) -> String
+    def hex2bin: (String hex) -> String
+  end
+end
