@@ -2,10 +2,22 @@ require 'schnorr_sig'
 require 'minitest/autorun'
 
 describe SchnorrSig do
-  describe "error classes" do
-  end
+  describe "type enforcement" do
+    it "enforces the class of any object" do
+      expect(SchnorrSig.check!('123', String)).must_equal '123'
+      expect(SchnorrSig.check!(123, Integer)).must_equal 123
+      expect { SchnorrSig.check!([], String) }.must_raise TypeError
+    end
 
-  describe "validation functions" do
+    it "enforces binary strings: type, encoding, length" do
+      expect(SchnorrSig.binary!("\x00\x01".b, 2)).must_equal "\x00\x01".b
+      expect {
+        SchnorrSig.binary!("\x00\x01".b, 3)
+      }.must_raise SchnorrSig::SizeError
+      expect {
+        SchnorrSig.binary!("\x00\x01", 2)
+      }.must_raise EncodingError
+    end
   end
 
   describe "conversion functions" do
