@@ -22,10 +22,15 @@ module SchnorrSig
   #   The message, m:     UTF-8 / binary / agnostic
   #   A signature, sig:   64 bytes binary
   # Output
-  #   Boolean, may raise SchnorrSig::Error
-  def self.verify?(pk, m, sig)
+  #   Boolean, may raise SchnorrSig::Error, Secp256k1::Error
+  def self.strict_verify?(pk, m, sig)
     binary!(pk, KEY) and check!(m, String) and binary!(sig, SIG)
     signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
+  end
+
+  # as above but swallow errors and return false
+  def self.verify?(pk, m, sig)
+    strict_verify?(pk, m, sig) rescue false
   end
 
   # Input
