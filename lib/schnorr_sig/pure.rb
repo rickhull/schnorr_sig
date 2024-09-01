@@ -211,15 +211,17 @@ module SchnorrSig
 end
 
 if __FILE__ == $0
-  msg = 'hello world'
-  sk, pk = SchnorrSig::Pure.keypair
-  puts "Message: #{msg}"
-  puts "Secret key: #{SchnorrSig::Pure.bin2hex(sk)}"
-  puts "Public key: #{SchnorrSig::Pure.bin2hex(pk)}"
+  include SchnorrSig
 
-  sig = SchnorrSig::Pure.sign(sk, msg)
+  msg = 'hello world'
+  sk, pk = Pure.keypair
+  puts "Message: #{msg}"
+  puts "Secret key: #{Pure.bin2hex(sk)}"
+  puts "Public key: #{Pure.bin2hex(pk)}"
+
+  sig = Pure.sign(sk, msg)
   puts
-  puts "Verified signature: #{SchnorrSig::Pure.bin2hex(sig)}"
+  puts "Verified signature: #{Pure.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
 end

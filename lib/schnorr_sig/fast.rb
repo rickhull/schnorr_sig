@@ -79,16 +79,18 @@ module SchnorrSig
 end
 
 if __FILE__ == $0
+  include SchnorrSig
+
   msg = 'hello world'.ljust(32, ' ')
 
-  sk, pk = SchnorrSig::Fast.keypair
+  sk, pk = Fast.keypair
   puts "Message: #{msg}"
-  puts "Secret key: #{SchnorrSig::Fast.bin2hex(sk)}"
-  puts "Public key: #{SchnorrSig::Fast.bin2hex(pk)}"
+  puts "Secret key: #{Fast.bin2hex(sk)}"
+  puts "Public key: #{Fast.bin2hex(pk)}"
 
-  sig = SchnorrSig::Fast.sign(sk, msg)
+  sig = Fast.sign(sk, msg)
   puts
-  puts "Verified signature: #{SchnorrSig::Fast.bin2hex(sig)}"
+  puts "Verified signature: #{Fast.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
 end
