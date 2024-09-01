@@ -3,15 +3,9 @@ module SchnorrSig
   end
   class SizeError < Error
   end
-  class TypeError < Error
-  end
-  class EncodingError < Error
-  end
 
-  def self.integer!: (untyped i) -> true
-  def self.string!: (untyped str) -> true
-  def self.bytestring!: (untyped str, untyped size) -> true
-
+  def self.check!: (untyped val, Class cls) -> untyped
+  def self.binary!: (String str, Integer length) -> String
   def self.bin2big: (String str) -> Integer
   def self.big2bin: (Integer bignum) -> String
   def self.bin2hex: (String str) -> String

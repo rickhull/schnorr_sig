@@ -1,4 +1,5 @@
 module SchnorrSig
+  # placeholder for ECDSA types
   type ec_group = untyped
   type ec_point = untyped
 

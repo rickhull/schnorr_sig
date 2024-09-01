@@ -3,7 +3,7 @@ D = Steep::Diagnostic
 target :lib do
   signature "sig"
 
-  check "lib/schnorr_sig/common.rb"
+  check "lib/schnorr_sig.rb"
   check "lib/schnorr_sig/pure.rb"
 
   library "ecdsa_ext"

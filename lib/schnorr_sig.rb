@@ -25,13 +25,12 @@ module SchnorrSig
 
   # convert a giant integer to a binary string
   def self.big2bin(bignum)
-    # much faster than ECDSA::Format -- thanks ParadoxV5
     hex2bin(bignum.to_s(16).rjust(64, '0'))
   end
 
   # convert a binary string to a lowercase hex string
   def self.bin2hex(str)
-    str.unpack1('H*').to_s  # typechecker can't know unpack1 returns a string
+    str.unpack1('H*')
   end
 
   # convert a hex string to a binary string
