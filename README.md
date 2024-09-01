@@ -88,15 +88,28 @@ SchnorrSig.verify?(pk, msg, sig)  # => true
 
 ### Fast Implementation
 
-```ruby
-require 'schnorr_sig/fast' # not 'schnorr_sig'
-
-# everything else as above ...
-```
-
-Alternatively, ensure `ENV['SCHNORR_SIG']&.downcase == 'fast'`, and then
+Ensure `ENV['SCHNORR_SIG']&.downcase == 'fast'`, and then
 `require 'schnorr_sig'` will try the fast implementation first, before
 falling back to the pure implementation.
+
+After `require 'schnorr_sig'`, you can check which implementation is loaded
+by the presence of `SchnorrSig::Pure` or `SchnorrSig::Fast`.
+
+You can run each implementation side by side as follows:
+
+```ruby
+require 'schnorr_sig/pure'
+require 'schnorr_sig/fast'
+
+include SchnorrSig
+
+msg = 'hello world'
+
+sk, pk = Pure.keypair  # or Fast.keypair
+
+sig1 = Pure.sign(sk, msg)
+sig2 = Fast.sign(sk, msg)
+```
 
 # Elliptic Curves
 
@@ -192,7 +205,7 @@ pk = big2bin(point.x)            # public key: point.x as a binary string
 ```
 
 The implementation of
-[big2bin](https://github.com/rickhull/schnorr_sig/blob/master/lib/schnorr_sig/common.rb#L30)
+[big2bin](https://github.com/rickhull/schnorr_sig/blob/master/lib/schnorr_sig/utils.rb#L26)
 is left as an exercise for the reader.
 
 ## Formatting
