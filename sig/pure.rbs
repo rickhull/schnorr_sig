@@ -1,8 +1,4 @@
 module SchnorrSig
-  # placeholder for ECDSA types
-  type ec_group = untyped
-  type ec_point = untyped
-
   class SanityCheck < Error
   end
   class VerifyFail < Error
@@ -10,18 +6,18 @@ module SchnorrSig
   class InfinityPoint < Error
   end
 
-  GROUP: ec_group
+  GROUP: ECDSA::Group
   P: Integer
   N: Integer
   B: Integer
 
   module Pure
     def random_bytes: (Integer count) -> String
-    def point: (Integer int) -> ec_point
-    def select_even_y: (ec_point point, Integer even_val) -> Integer
+    def point: (Integer int) -> ECDSA::Point
+    def select_even_y: (ECDSA::Point point, Integer even_val) -> Integer
     def int: (String x) -> Integer
-    def bytes: (Integer | ec_point val) -> String
-    def lift_x: (Integer x) -> ec_point
+    def bytes: (Integer | ECDSA::Point val) -> String
+    def lift_x: (Integer x) -> ECDSA::Point
     def tagged_hash: (String tag, String msg) -> String
     def pubkey: (String sk) -> String
     def keypair: -> [String, String]
