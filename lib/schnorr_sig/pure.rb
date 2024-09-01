@@ -14,6 +14,12 @@ module SchnorrSig
   B = GROUP.byte_length # 32
 
   module Pure
+
+    #
+    # Utils
+    #
+
+    # use SecureRandom unless ENV['NO_SECURERANDOM'] is nonempty
     def random_bytes(count)
       nsr = ENV['NO_SECURERANDOM']
       (nsr and !nsr.empty?) ? Random.bytes(count) : SecureRandom.bytes(count)
@@ -21,8 +27,7 @@ module SchnorrSig
 
     # int (dot) G, returns ECDSA::Point
     def point(int)
-      # ecdsa_ext uses jacobian projection: 10x faster
-      (GROUP.generator.to_jacobian * int).to_affine
+      (GROUP.generator.to_jacobian * int).to_affine # 10x faster via ecdsa_ext
     end
 
     # returns even_val or N - even_val
@@ -34,7 +39,6 @@ module SchnorrSig
     def int(x)
       bin2big(x)
     end
-    # alias_method :int, :bin2big
 
     # bytes(val) function signature matches BIP340, returns a binary string
     def bytes(val)
@@ -51,6 +55,81 @@ module SchnorrSig
         raise(SanityCheck, val.inspect)
       end
     end
+
+    # BIP340: The function lift_x(x), where x is a 256-bit unsigned integer,
+    #         returns the point P for which x(P) = x and has_even_y(P),
+    #         or fails if x is greater than p-1 or no such point exists.
+    # Input
+    #   A large integer, x
+    # Output
+    #   ECDSA::Point
+    def lift_x(x)
+      check!(x, Integer)
+
+      # BIP340: Fail if x >= p
+      raise(SizeError, "x") if x >= P or x <= 0
+
+      # BIP340: Let c = x^3 + 7 mod p
+      c = (x.pow(3, P) + 7) % P
+
+      # BIP340: Let y = c ^ ((p + 1) / 4) mod p
+      y = c.pow((P + 1) / 4, P) # use pow to avoid Bignum overflow
+
+      # BIP340: Fail if c != y^2 mod p
+      raise(SanityCheck, "c != y^2 mod p") if c != y.pow(2, P)
+
+      # BIP340: Return the unique point P such that:
+      #   x(P) = x and y(P) = y    if y mod 2 = 0
+      #   y(P) = p - y             otherwise
+      GROUP.new_point [x, y.even? ? y : P - y]
+    end
+
+    # see https://bips.xyz/340#design (Tagged hashes)
+    # Input
+    #   A tag:            UTF-8 > binary > agnostic
+    #   The payload, msg: UTF-8 / binary / agnostic
+    # Output
+    #   32 bytes binary
+    def tagged_hash(tag, msg)
+      check!(tag, String) and check!(msg, String)
+      warn("tag expected to be UTF-8") unless tag.encoding == Encoding::UTF_8
+
+      # BIP340: The function hash[name](x) where x is a byte array
+      #         returns the 32-byte hash
+      #         SHA256(SHA256(tag) || SHA256(tag) || x)
+      #         where tag is the UTF-8 encoding of name.
+      tag_hash = Digest::SHA256.digest(tag)
+      Digest::SHA256.digest(tag_hash + tag_hash + msg)
+    end
+
+    #
+    # Keys
+    #
+
+    # Input
+    #   The secret key, sk: 32 bytes binary
+    # Output
+    #   32 bytes binary (represents P.x for point P on the curve)
+    def pubkey(sk)
+      binary!(sk, KEY)
+
+      # BIP340: Let d' = int(sk)
+      # BIP340: Fail if d' = 0 or d' >= n
+      # BIP340: Return bytes(d' . G)
+      d0 = int(sk)
+      raise(SizeError, "d0") if !d0.positive? or d0 >= N
+      bytes(point(d0))
+    end
+
+    # generate a new keypair based on random data
+    def keypair
+      sk = random_bytes(KEY)
+      [sk, pubkey(sk)]
+    end
+
+    #
+    # Signatures
+    #
 
     # Input
     #   The secret key, sk:       32 bytes binary
@@ -104,24 +183,6 @@ module SchnorrSig
       sig
     end
 
-    # see https://bips.xyz/340#design (Tagged hashes)
-    # Input
-    #   A tag:            UTF-8 > binary > agnostic
-    #   The payload, msg: UTF-8 / binary / agnostic
-    # Output
-    #   32 bytes binary
-    def tagged_hash(tag, msg)
-      check!(tag, String) and check!(msg, String)
-      warn("tag expected to be UTF-8") unless tag.encoding == Encoding::UTF_8
-
-      # BIP340: The function hash[name](x) where x is a byte array
-      #         returns the 32-byte hash
-      #         SHA256(SHA256(tag) || SHA256(tag) || x)
-      #         where tag is the UTF-8 encoding of name.
-      tag_hash = Digest::SHA256.digest(tag)
-      Digest::SHA256.digest(tag_hash + tag_hash + msg)
-    end
-
     # Input
     #   The public key, pk: 32 bytes binary
     #   The message, m:     UTF-8 / binary / agnostic
@@ -154,55 +215,6 @@ module SchnorrSig
       # BIP340: Return success iff no prior failure
       big_r = point(s) + p.multiply_by_scalar(e).negate
       !big_r.infinity? and big_r.y.even? and big_r.x == r
-    end
-
-    # BIP340: The function lift_x(x), where x is a 256-bit unsigned integer,
-    #         returns the point P for which x(P) = x and has_even_y(P),
-    #         or fails if x is greater than p-1 or no such point exists.
-    # Input
-    #   A large integer, x
-    # Output
-    #   ECDSA::Point
-    def lift_x(x)
-      check!(x, Integer)
-
-      # BIP340: Fail if x >= p
-      raise(SizeError, "x") if x >= P or x <= 0
-
-      # BIP340: Let c = x^3 + 7 mod p
-      c = (x.pow(3, P) + 7) % P
-
-      # BIP340: Let y = c ^ ((p + 1) / 4) mod p
-      y = c.pow((P + 1) / 4, P) # use pow to avoid Bignum overflow
-
-      # BIP340: Fail if c != y^2 mod p
-      raise(SanityCheck, "c != y^2 mod p") if c != y.pow(2, P)
-
-      # BIP340: Return the unique point P such that:
-      #   x(P) = x and y(P) = y    if y mod 2 = 0
-      #   y(P) = p - y             otherwise
-      GROUP.new_point [x, y.even? ? y : P - y]
-    end
-
-    # Input
-    #   The secret key, sk: 32 bytes binary
-    # Output
-    #   32 bytes binary (represents P.x for point P on the curve)
-    def pubkey(sk)
-      binary!(sk, KEY)
-
-      # BIP340: Let d' = int(sk)
-      # BIP340: Fail if d' = 0 or d' >= n
-      # BIP340: Return bytes(d' . G)
-      d0 = int(sk)
-      raise(SizeError, "d0") if !d0.positive? or d0 >= N
-      bytes(point(d0))
-    end
-
-    # generate a new keypair based on random data
-    def keypair
-      sk = random_bytes(KEY)
-      [sk, pubkey(sk)]
     end
   end
 
