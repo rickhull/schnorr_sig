@@ -214,14 +214,18 @@ if __FILE__ == $0
   include SchnorrSig
 
   msg = 'hello world'
+  hsh = Pure.tagged_hash('test', msg)
+
   sk, pk = Pure.keypair
   puts "Message: #{msg}"
+  puts "Hash: #{Pure.bin2hex(hsh)}"
   puts "Secret key: #{Pure.bin2hex(sk)}"
   puts "Public key: #{Pure.bin2hex(pk)}"
-
-  sig = Pure.sign(sk, msg)
   puts
+
+  sig = Pure.sign(sk, hsh)
   puts "Verified signature: #{Pure.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
+  puts "Really verified: #{Pure.verify?(pk, hsh, sig)}"
 end

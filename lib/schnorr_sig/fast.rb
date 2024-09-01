@@ -116,16 +116,19 @@ end
 if __FILE__ == $0
   include SchnorrSig
 
-  msg = 'hello world'.ljust(32, ' ')
+  msg = 'hello world'
+  hsh = Fast.tagged_hash('test', msg)
 
   sk, pk = Fast.keypair
   puts "Message: #{msg}"
+  puts "Hash: #{Fast.bin2hex(hsh)}"
   puts "Secret key: #{Fast.bin2hex(sk)}"
   puts "Public key: #{Fast.bin2hex(pk)}"
-
-  sig = Fast.sign(sk, msg)
   puts
+
+  sig = Fast.sign(sk, hsh)
   puts "Verified signature: #{Fast.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
+  puts "Really Verified: #{Fast.verify?(pk, hsh, sig)}"
 end
