@@ -2,8 +2,9 @@ require 'rake/testtask'
 
 Rake::TestTask.new :test do |t|
   t.test_files = [
-    'test/schnorr_sig.rb',
+    'test/utils.rb',
     'test/pure.rb',
+    'test/vectors.rb',
   ]
   t.warning = true
 end

@@ -1,5 +1,7 @@
-require 'schnorr_sig'
+require 'schnorr_sig/utils'
 require 'minitest/autorun'
+
+SchnorrSig.extend(SchnorrSig::Utils)
 
 describe SchnorrSig do
   describe "type enforcement" do
