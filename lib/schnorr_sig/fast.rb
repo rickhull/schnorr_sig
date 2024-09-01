@@ -74,7 +74,7 @@ module SchnorrSig
 end
 
 if __FILE__ == $0
-  msg = 'hello world'
+  msg = 'hello world'.ljust(32, ' ')
 
   sk, pk = SchnorrSig.keypair
   puts "Message: #{msg}"
