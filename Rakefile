@@ -17,7 +17,7 @@ Rake::TestTask.new :vectors do |t|
   t.warning = true
 end
 
-task default: [:test, :vectors]
+task default: :test
 
 begin
   require 'buildar'
