@@ -4,7 +4,7 @@ require 'rbsecp256k1' # gem, C extension
 # re-open SchnorrSig to add more functions, errors, and constants
 module SchnorrSig
   CONTEXT = Secp256k1::Context.create
-  FORCE_32_BYTE_MSG = true
+  FORCE_32 = true # currently rbsecp256k1 restricts message size to 32 bytes
 
   # Input
   #   The secret key, sk: 32 bytes binary
@@ -13,7 +13,7 @@ module SchnorrSig
   #   64 bytes binary
   def self.sign(sk, m)
     binary!(sk, KEY) and check!(m, String)
-    m = m[0..31].ljust(32, ' ') if FORCE_32_BYTE_MSG
+    raise(SizeError, "32 bytes expected") if FORCE_32 and m.length != 32
     CONTEXT.sign_schnorr(key_pair(sk), m).serialized
   end
 
