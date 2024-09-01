@@ -14,6 +14,11 @@ module SchnorrSig
   B = GROUP.byte_length # 32
 
   module Pure
+    def random_bytes(count)
+      nsr = ENV['NO_SECURERANDOM']
+      (nsr and !nsr.empty?) ? Random.bytes(count) : SecureRandom.bytes(count)
+    end
+
     # int (dot) G, returns ECDSA::Point
     def point(int)
       # ecdsa_ext uses jacobian projection: 10x faster
@@ -53,7 +58,8 @@ module SchnorrSig
     #   Auxiliary random data, a: 32 bytes binary
     # Output
     #   The signature, sig:       64 bytes binary
-    def sign(sk, m, a = Random.bytes(B))
+    def sign(sk, m, auxrand: nil)
+      a = auxrand.nil? ? random_bytes(B) : auxrand
       binary!(sk, KEY) and check!(m, String) and binary!(a, B)
 
       # BIP340: Let d' = int(sk)
@@ -195,13 +201,7 @@ module SchnorrSig
 
     # generate a new keypair based on random data
     def keypair
-      sk = Random.bytes(KEY)
-      [sk, pubkey(sk)]
-    end
-
-    # as above, but using SecureRandom
-    def secure_keypair
-      sk = SecureRandom.bytes(KEY)
+      sk = random_bytes(KEY)
       [sk, pubkey(sk)]
     end
   end
