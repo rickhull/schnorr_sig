@@ -79,11 +79,25 @@ msg = 'hello world'
 # generate secret key and public key
 sk, pk = SchnorrSig.keypair
 
-# sign a message; exception raised on failure
+# we can sign the message itself
 sig = SchnorrSig.sign(sk, msg)
 
 # the signature has already been verified, but let's check
 SchnorrSig.verify?(pk, msg, sig)  # => true
+
+# more commonly, you can sign a SHA256 hash of the message
+h = Digest::SHA256.digest(msg)
+sig = SchnorrSig.sign(sk, h)
+SchnorrSig.verify?(pk, h, sig)    # => true
+
+# you can even use SchnorrSig's concept of a tagged hash
+h = SchnorrSig.tagged_hash('signing', msg)
+sig = SchnorrSig.sign(sk, h)
+SchnorrSig.verify?(pk, h, sig)    # => true
+
+# validate that the hash corresponds to the message
+# re-hash the message with the same tag
+SchnorrSig.tagged_hash('signing', msg) == h  # => true
 ```
 
 ### Fast Implementation
@@ -103,12 +117,16 @@ require 'schnorr_sig/fast'
 
 include SchnorrSig
 
-msg = 'hello world'
-
 sk, pk = Pure.keypair  # or Fast.keypair
 
-sig1 = Pure.sign(sk, msg)
-sig2 = Fast.sign(sk, msg)
+msg = 'hello world'
+hsh = Fast.tagged_hash('message', msg)
+
+sig1 = Pure.sign(sk, hsh)
+sig2 = Fast.sign(sk, hsh)
+
+Fast.verify?(pk, hsh, sig1) # => true
+Pure.verify?(pk, hsh, sig2) # => true
 ```
 
 # Elliptic Curves
