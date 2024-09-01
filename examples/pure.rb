@@ -1,6 +1,6 @@
 require 'schnorr_sig/pure'
 
-ENV['NO_SECURERANDOM'] = 1
+ENV['NO_SECURERANDOM'] = '1'
 
 include SchnorrSig
 
