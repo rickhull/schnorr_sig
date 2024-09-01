@@ -236,8 +236,8 @@ if __FILE__ == $0
   puts
 
   sig = Pure.sign(sk, hsh)
-  puts "Verified signature: #{Pure.bin2hex(sig)}"
+  puts "Signature: #{Pure.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
-  puts "Really verified: #{Pure.verify?(pk, hsh, sig)}"
+  puts "Verified: #{Pure.verify?(pk, hsh, sig)}"
 end

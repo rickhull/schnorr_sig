@@ -130,8 +130,8 @@ if __FILE__ == $0
   puts
 
   sig = Fast.sign(sk, hsh)
-  puts "Verified signature: #{Fast.bin2hex(sig)}"
+  puts "Signature: #{Fast.bin2hex(sig)}"
   puts "Encoding: #{sig.encoding}"
   puts "Length: #{sig.length}"
-  puts "Really Verified: #{Fast.verify?(pk, hsh, sig)}"
+  puts "Verified: #{Fast.verify?(pk, hsh, sig)}"
 end
