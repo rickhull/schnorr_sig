@@ -39,6 +39,8 @@ describe SchnorrSig do
 
     it "converts hex strings to binary strings" do
       expect(SchnorrSig.hex2bin("deadbeef")).must_equal "\xDE\xAD\xBE\xEF".b
+      expect(SchnorrSig.hex2bin("deadbeef")).must_equal "\xde\xad\xbe\xef".b
+      expect(SchnorrSig.hex2bin("DEADBEEF")).must_equal "\xDE\xAD\xBE\xEF".b
       expect(SchnorrSig.hex2bin("DEADBEEF")).must_equal "\xde\xad\xbe\xef".b
     end
   end
