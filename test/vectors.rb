@@ -1,4 +1,4 @@
-require 'schnorr_sig'
+require 'schnorr_sig/env'
 require 'csv'
 
 path = File.join(__dir__, 'vectors.csv')
