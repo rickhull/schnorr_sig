@@ -5,9 +5,8 @@ module SchnorrSig
   CONTEXT = Secp256k1::Context.create
 
   # KeyPair
-  # - Create
+  # - Create / Split
   #   * Context.create.generate_keypair => KeyPair
-  # - Split
   #   * KeyPair#xonly_public_key => XOnlyPublicKey
   #   * KeyPair#private_key => PrivateKey
   # - String Conversion
@@ -17,24 +16,18 @@ module SchnorrSig
   #   * PrivateKey#data => sk
 
   # Signature
-  # - Sign
+  # - Sign / Verify
   #   * Context.create.sign_schnorr(KeyPair, m) => Signature
-  # - Verify
   #   * Signature#verify(m, XOnlyPublicKey) => bool
   # - String Conversion
   #   * Signature#serialized => sig (64B String)
   #   * Signature#from_data(sig) => Signature
 
-
   module Fast
-    # Input
-    #   The signature, str: 64 bytes binary
-    # Output
-    #   Secp256k1::SchnorrSignature
-    def signature(str)
-      binary!(str, SIG)
-      Secp256k1::SchnorrSignature.from_data(str)
-    end
+
+    #
+    # Keys
+    #
 
     # Input
     #   (The secret key, sk: 32 bytes binary)
@@ -50,6 +43,37 @@ module SchnorrSig
     end
 
     # Input
+    #   Secp256k1::KeyPair
+    # Output
+    #  [sk, pk] (32 bytes binary)
+    def extract_keys(keypair_obj)
+      [keypair_obj.private_key.data, keypair_obj.xonly_public_key.serialized]
+    end
+
+    # Input
+    #   The secret key, sk: 32 bytes binary
+    # Output
+    #   The public key: 32 bytes binary
+    def pubkey(sk) = keypair_obj(sk).xonly_public_key.serialized
+
+    # Output
+    #   [sk, pk] (32 bytes binary)
+    def keypair = extract_keys(keypair_obj())
+
+    #
+    # Signatures
+    #
+
+    # Input
+    #   The signature, str: 64 bytes binary
+    # Output
+    #   Secp256k1::SchnorrSignature
+    def signature(str)
+      binary!(str, SIG)
+      Secp256k1::SchnorrSignature.from_data(str)
+    end
+
+    # Input
     #   The secret key, sk: 32 bytes binary
     #   The message, m:     32 byte hash value
     # Output
@@ -57,16 +81,6 @@ module SchnorrSig
     def sign(sk, m)
       binary!(sk, KEY) and binary!(m, 32)
       CONTEXT.sign_schnorr(keypair_obj(sk), m).serialized
-    end
-
-    # Input
-    #   tag: UTF-8 > binary > agnostic
-    #   msg: UTF-8 / binary / agnostic
-    # Output
-    #   32 bytes binary
-    def tagged_hash(tag, msg)
-      check!(tag, String) and check!(msg, String)
-      CONTEXT.tagged_sha256(tag, msg)
     end
 
     # Input
@@ -81,31 +95,20 @@ module SchnorrSig
     end
 
     # as above but swallow errors and return false
-    def verify?(pk, m, sig)
-      strict_verify?(pk, m, sig) rescue false
-    end
+    def verify?(pk, m, sig) = strict_verify?(pk, m, sig) rescue false
+
+    #
+    # Utility
+    #
 
     # Input
-    #   The secret key, sk: 32 bytes binary
+    #   tag: UTF-8 > binary > agnostic
+    #   msg: UTF-8 / binary / agnostic
     # Output
-    #   The public key: 32 bytes binary
-    def pubkey(sk)
-      keypair_obj(sk).xonly_public_key.serialized
-    end
-
-    # Input
-    #   Secp256k1::KeyPair
-    # Output
-    #  [sk, pk] (32 bytes binary)
-    def extract_keys(keypair_obj)
-      [keypair_obj.private_key.data, keypair_obj.xonly_public_key.serialized]
-    end
-
-    # This method matches the pure.rb signature
-    # Output
-    #   [sk, pk] (32 bytes binary)
-    def keypair
-      extract_keys(keypair_obj())
+    #   32 bytes binary
+    def tagged_hash(tag, msg)
+      check!(tag, String) and check!(msg, String)
+      CONTEXT.tagged_sha256(tag, msg)
     end
   end
 
