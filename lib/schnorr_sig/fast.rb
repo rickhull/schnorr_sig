@@ -1,45 +1,46 @@
 require 'schnorr_sig/utils'
 require 'rbsecp256k1' # gem, C extension
 
-# this implementation is based on libsecp256k1
 module SchnorrSig
   CONTEXT = Secp256k1::Context.create
-  FORCE_32 = true # currently rbsecp256k1 restricts message size to 32 bytes
+
+  # KeyPair
+  # - Create
+  #   * Context.create.generate_keypair => KeyPair
+  # - Split
+  #   * KeyPair#xonly_public_key => XOnlyPublicKey
+  #   * KeyPair#private_key => PrivateKey
+  # - String Conversion
+  #   * Context.create.keypair_from_private_key(sk) => KeyPair
+  #   * XOnlyPublicKey.from_data(pk) => XOnlyPublicKey
+  #   * XOnlyPublicKey#serialized => pk
+  #   * PrivateKey#data => sk
+
+  # Signature
+  # - Sign
+  #   * Context.create.sign_schnorr(KeyPair, m) => Signature
+  # - Verify
+  #   * Signature#verify(m, XOnlyPublicKey) => bool
+  # - String Conversion
+  #   * Signature#serialized => sig (64B String)
+  #   * Signature#from_data(sig) => Signature
+
 
   module Fast
     # Input
-    #   The secret key, sk: 32 bytes binary
-    #   The message, m:     UTF-8 / binary / agnostic
+    #   The signature, str: 64 bytes binary
     # Output
-    #   64 bytes binary
-    def sign(sk, m)
-      binary!(sk, KEY) and check!(m, String)
-      raise(SizeError, "32 bytes expected") if FORCE_32 and m.length != 32
-      CONTEXT.sign_schnorr(key_pair(sk), m).serialized
+    #   Secp256k1::SchnorrSignature
+    def signature(str)
+      binary!(str, SIG)
+      Secp256k1::SchnorrSignature.from_data(str)
     end
 
-    # Input
-    #   The public key, pk: 32 bytes binary
-    #   The message, m:     UTF-8 / binary / agnostic
-    #   A signature, sig:   64 bytes binary
-    # Output
-    #   Boolean, may raise SchnorrSig::Error, Secp256k1::Error
-    def strict_verify?(pk, m, sig)
-      binary!(pk, KEY) and check!(m, String) and binary!(sig, SIG)
-      signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
-    end
-
-    # as above but swallow errors and return false
-    def verify?(pk, m, sig)
-      strict_verify?(pk, m, sig) rescue false
-    end
-
-    # This method is native to rbsecp256k1
     # Input
     #   (The secret key, sk: 32 bytes binary)
     # Output
     #   Secp256k1::KeyPair
-    def key_pair(sk = nil)
+    def keypair_obj(sk = nil)
       if sk
         binary!(sk, KEY)
         CONTEXT.key_pair_from_private_key(sk)
@@ -48,12 +49,40 @@ module SchnorrSig
       end
     end
 
-    # This method matches the pure.rb signature
+    # Input
+    #   The secret key, sk: 32 bytes binary
+    #   The message, m:     32 byte hash value
     # Output
-    #   [sk, pk]
-    def keypair
-      kp = self.key_pair
-      [kp.private_key.data, kp.xonly_public_key.serialized]
+    #   64 bytes binary
+    def sign(sk, m)
+      binary!(sk, KEY) and binary!(m, 32)
+      CONTEXT.sign_schnorr(keypair_obj(sk), m).serialized
+    end
+
+    # Input
+    #   tag: UTF-8 > binary > agnostic
+    #   msg: UTF-8 / binary / agnostic
+    # Output
+    #   32 bytes binary
+    def tagged_hash(tag, msg)
+      check!(tag, String) and check!(msg, String)
+      CONTEXT.tagged_sha256(tag, msg)
+    end
+
+    # Input
+    #   The public key, pk: 32 bytes binary
+    #   The message, m:     32 byte hash value
+    #   A signature, sig:   64 bytes binary
+    # Output
+    #   Boolean, may raise SchnorrSig::Error, Secp256k1::Error
+    def strict_verify?(pk, m, sig)
+      binary!(pk, KEY) and binary!(m, 32) and binary!(sig, SIG)
+      signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
+    end
+
+    # as above but swallow errors and return false
+    def verify?(pk, m, sig)
+      strict_verify?(pk, m, sig) rescue false
     end
 
     # Input
@@ -61,16 +90,22 @@ module SchnorrSig
     # Output
     #   The public key: 32 bytes binary
     def pubkey(sk)
-      self.key_pair(sk).xonly_public_key.serialized
+      keypair_obj(sk).xonly_public_key.serialized
     end
 
     # Input
-    #   The signature, str: 64 bytes binary
+    #   Secp256k1::KeyPair
     # Output
-    #   Secp256k1::SchnorrSignature
-    def signature(str)
-      binary!(str, SIG)
-      Secp256k1::SchnorrSignature.from_data(str)
+    #  [sk, pk] (32 bytes binary)
+    def extract_keys(keypair_obj)
+      [keypair_obj.private_key.data, keypair_obj.xonly_public_key.serialized]
+    end
+
+    # This method matches the pure.rb signature
+    # Output
+    #   [sk, pk] (32 bytes binary)
+    def keypair
+      extract_keys(keypair_obj())
     end
   end
 
