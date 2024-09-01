@@ -3,6 +3,8 @@ require 'minitest/autorun'
 
 include SchnorrSig
 
+ENV['NO_SECURERANDOM'] = '1'
+
 describe Pure do
   it "converts any integer to a point on the curve" do
     expect(Pure.point(99)).must_be_kind_of ECDSA::Point

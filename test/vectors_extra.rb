@@ -1,6 +1,8 @@
 require 'schnorr_sig'
 require 'csv'
 
+ENV['NO_SECURERANDOM'] = '1'
+
 path = File.join(__dir__, 'vectors.csv')
 table = CSV.read(path, headers: true)
 
