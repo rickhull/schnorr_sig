@@ -22,9 +22,6 @@ module SchnorrSig
 
   def self.sign: (String sk, String m, ?String a) -> String
   def self.tagged_hash: (String tag, String msg) -> String
-  def self.verify?: (String pk, String m, String sig) -> bool
   def self.lift_x: (Integer x) -> ec_point
-  def self.pubkey: (String sk) -> String
-  def self.keypair: () -> [String, String]
   def self.secure_keypair: () -> [String, String]
 end

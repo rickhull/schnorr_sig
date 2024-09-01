@@ -2,11 +2,7 @@ module SchnorrSig
   CONTEXT: Secp256k1::Context
   FORCE_32_BYTE_MSG: bool
 
-  def self.sign: (String sk, String m) -> String
   def self.strict_verify?: (String pk, String m, String sig) -> bool
-  def self.verify?: (String pk, String m, String sig) -> bool
   def self.key_pair: (String? sk) -> Secp256k1::KeyPair
-  def self.keypair: (String? sk) -> [String, String]
-  def self.pubkey: (String sk) -> String
   def self.signature: (String str) -> Secp256k1::SchnorrSignature
 end
