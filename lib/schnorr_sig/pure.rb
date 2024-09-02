@@ -5,8 +5,6 @@ autoload :SecureRandom, 'securerandom' # stdlib
 # This implementation is based on the BIP340 spec: https://bips.xyz/340
 module SchnorrSig
   class SanityCheck < Error; end
-  class VerifyFail < Error; end
-  class InfinityPoint < Error; end
 
   GROUP = ECDSA::Group::Secp256k1
   P = GROUP.field.prime # smaller than 256**32
@@ -48,7 +46,7 @@ module SchnorrSig
       when ECDSA::Point
         # BIP340: The function bytes(P), where P is a point,
         # returns bytes(x(P)).
-        val.infinity? ? raise(InfinityPoint, val.inspect) : big2bin(val.x)
+        val.infinity? ? raise(SanityCheck, val.inspect) : big2bin(val.x)
       else
         raise(SanityCheck, val.inspect)
       end
@@ -177,7 +175,7 @@ module SchnorrSig
       # BIP340: Fail unless Verify(bytes(P), m, sig)
       # BIP340: Return the signature sig
       sig = bytes_r + bytes((k + e * d) % N)
-      raise(VerifyFail) unless verify?(bytes_p, m, sig)
+      raise(SanityCheck, "sig did not verify") unless verify?(bytes_p, m, sig)
       sig
     end
 
@@ -219,7 +217,7 @@ module SchnorrSig
     def soft_verify?(pk, m, sig)
       begin
         verify?(pk, m, sig)
-      rescue SanityCheck, InfinityPoint
+      rescue SanityCheck
         false
       end
     end

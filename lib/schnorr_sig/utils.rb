@@ -1,21 +1,23 @@
 module SchnorrSig
   class Error < RuntimeError; end
-  class SizeError < Error; end
+  class SpecError < Error; end
 
   KEY = 32 # bytes
   SIG = 64 # bytes
 
   module Utils
-    # raise TypeError or return val
+    # raise SpecError or return val
     def check!(val, cls)
-      val.is_a?(cls) ? val : raise(TypeError, "#{cls}: #{val.inspect}")
+      val.is_a?(cls) ? val : raise(SpecError, "#{cls}: #{val.inspect}")
     end
 
-    # raise TypeError, EncodingError, or SizeError, or return str
+    # raise SpecError or return str
     def binary!(str, length)
       check!(str, String)
-      raise(EncodingError, str.encoding) if str.encoding != Encoding::BINARY
-      raise(SizeError, str.length) if str.length != length
+      if str.encoding != Encoding::BINARY
+        raise(SpecError, "Encoding: #{str.encoding}")
+      end
+      raise(SpecError, "Length: #{str.length}") if str.length != length
       str
     end
 
