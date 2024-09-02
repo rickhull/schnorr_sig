@@ -41,7 +41,7 @@ table.each { |row|
     begin
       result = SchnorrSig.soft_verify?(pk, m, sig)
       verify_msg = (result == expected) ? "verify match" : "verify mismatch"
-    rescue SchnorrSig::SpecError => e
+    rescue SchnorrSig::SpecError
       verify_msg = "verify error"
     end
   else

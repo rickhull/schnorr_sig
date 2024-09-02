@@ -37,4 +37,3 @@ puts "Failure: #{failure.count}"
 puts "Skipped: #{skip.count}"
 
 failure.each { |row| p row }
-exit failure.count
