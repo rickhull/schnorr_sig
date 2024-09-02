@@ -110,6 +110,8 @@ Here are the fundamental functions common to both implementations:
 * `tagged_hash(str tag, str msg)` *returns* `32B hash`
 * `keypair()` *returns* `[32B sk, 32B pk]`
 
+Use `soft_verify?(pk, msg, sig)` to yield `false` if errors are raised.
+
 ### Differences
 
 * Fast: `sign(32B sk, 32B msg)`

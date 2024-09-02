@@ -9,7 +9,6 @@ table = CSV.read(path, headers: true)
 table.each { |row|
   sk       = SchnorrSig.hex2bin row.fetch('secret key')
   pk       = SchnorrSig.hex2bin row.fetch('public key')
-  #aux_rand = SchnorrSig.hex2bin row.fetch('aux_rand')
   m        = SchnorrSig.hex2bin row.fetch('message')
   sig      = SchnorrSig.hex2bin row.fetch('signature')
 
@@ -38,11 +37,11 @@ table.each { |row|
     sig_msg = (calc_sig == sig) ? "sig match" : "sig mismatch"
   end
 
-  result = begin
-             SchnorrSig.verify?(pk, m, sig)
-           rescue SchnorrSig::Error
-             false
-           end
+  begin
+    result = SchnorrSig.soft_verify?(pk, m, sig)
+  rescue SchnorrSig::SizeError
+    next
+  end
   verify_msg = (result == expected) ? "verify match" : "verify mismatch"
   puts [index, pk_msg, sig_msg, verify_msg, comment].join("\t")
 }

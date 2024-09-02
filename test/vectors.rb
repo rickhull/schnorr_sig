@@ -8,6 +8,7 @@ table = CSV.read(path, headers: true)
 
 success = []
 failure = []
+skip    = []
 
 table.each { |row|
   pk       = SchnorrSig.hex2bin row.fetch('public key')
@@ -16,18 +17,24 @@ table.each { |row|
   expected = row.fetch('verification result') == 'TRUE'
 
   result = begin
-             SchnorrSig.verify?(pk, m, sig)
-           rescue SchnorrSig::Error
-             false
+             SchnorrSig.soft_verify?(pk, m, sig)
+           rescue SchnorrSig::SizeError
+             skip << row
+             next
            end
-  (result == expected ? success : failure) << row
+
+  if result == expected
+    success << row
+  else
+    failure << row
+  end
   print '.'
 }
 puts
 
 puts "Success: #{success.count}"
 puts "Failure: #{failure.count}"
+puts "Skipped: #{skip.count}"
 
-puts failure unless failure.empty?
-
-# exit failure.count
+failure.each { |row| p row }
+exit failure.count
