@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.files = %w[schnorr_sig.gemspec VERSION README.md Rakefile]
   s.files += Dir['lib/**/*.rb']
   s.files += Dir['test/**/*.rb']
+  s.files += Dir['sig/**/*.rbs']
 
   s.add_dependency "ecdsa_ext", "~> 0"
 end
