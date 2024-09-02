@@ -1,7 +1,7 @@
 module SchnorrSig
   class Error < RuntimeError
   end
-  class SizeError < Error
+  class SpecError < Error
   end
 
   KEY: 32
