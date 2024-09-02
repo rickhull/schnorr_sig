@@ -10,17 +10,17 @@ describe Utils do
     it "enforces the class of any object" do
       expect(Utils.check!('123', String)).must_equal '123'
       expect(Utils.check!(123, Integer)).must_equal 123
-      expect { Utils.check!([], String) }.must_raise TypeError
+      expect { Utils.check!([], String) }.must_raise SpecError
     end
 
     it "enforces binary strings: type, encoding, length" do
       expect(Utils.binary!("\x00\x01".b, 2)).must_equal "\x00\x01".b
       expect {
         Utils.binary!("\x00\x01".b, 3)
-      }.must_raise SchnorrSig::SizeError
+      }.must_raise SpecError
       expect {
         Utils.binary!("\x00\x01", 2)
-      }.must_raise EncodingError
+      }.must_raise SpecError
     end
   end
 

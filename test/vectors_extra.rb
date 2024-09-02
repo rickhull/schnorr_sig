@@ -31,18 +31,22 @@ table.each { |row|
     # calculate a signature
     begin
       calc_sig = SchnorrSig.sign(sk, m)
-    rescue SchnorrSig::Error
-      calc_sig = "sig error"
+      sig_msg = (calc_sig == sig) ? "sig match" : "sig mismatch"
+    rescue SchnorrSig::SpecError
+      sig_msg = "sig error"
     end
-    sig_msg = (calc_sig == sig) ? "sig match" : "sig mismatch"
   end
 
-  begin
-    result = SchnorrSig.soft_verify?(pk, m, sig)
-  rescue SchnorrSig::SizeError
-    next
+  if sig_msg != "sig error"
+    begin
+      result = SchnorrSig.soft_verify?(pk, m, sig)
+      verify_msg = (result == expected) ? "verify match" : "verify mismatch"
+    rescue SchnorrSig::SpecError => e
+      verify_msg = "verify error"
+    end
+  else
+    verify_msg = "sig error"
   end
-  verify_msg = (result == expected) ? "verify match" : "verify mismatch"
   puts [index, pk_msg, sig_msg, verify_msg, comment].join("\t")
 }
 puts

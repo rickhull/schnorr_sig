@@ -18,7 +18,7 @@ table.each { |row|
 
   result = begin
              SchnorrSig.soft_verify?(pk, m, sig)
-           rescue SchnorrSig::SizeError
+           rescue SchnorrSig::SpecError
              skip << row
              next
            end
