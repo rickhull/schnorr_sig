@@ -36,9 +36,7 @@ module SchnorrSig
     end
 
     # int(x) function signature matches BIP340, returns a bignum (presumably)
-    def int(x)
-      bin2big(x)
-    end
+    def int(x) = bin2big(x)
 
     # bytes(val) function signature matches BIP340, returns a binary string
     def bytes(val)
@@ -215,6 +213,15 @@ module SchnorrSig
       # BIP340: Return success iff no prior failure
       big_r = point(s) + p.multiply_by_scalar(e).negate
       !big_r.infinity? and big_r.y.even? and big_r.x == r
+    end
+
+    # as above but swallow internal errors and return false
+    def soft_verify?(pk, m, sig)
+      begin
+        verify?(pk, m, sig)
+      rescue SanityCheck, InfinityPoint
+        false
+      end
     end
   end
 

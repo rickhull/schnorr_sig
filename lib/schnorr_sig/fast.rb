@@ -89,13 +89,19 @@ module SchnorrSig
     #   A signature, sig:   64 bytes binary
     # Output
     #   Boolean, may raise SchnorrSig::Error, Secp256k1::Error
-    def strict_verify?(pk, m, sig)
+    def verify?(pk, m, sig)
       binary!(pk, KEY) and binary!(m, 32) and binary!(sig, SIG)
       signature(sig).verify(m, Secp256k1::XOnlyPublicKey.from_data(pk))
     end
 
-    # as above but swallow errors and return false
-    def verify?(pk, m, sig) = strict_verify?(pk, m, sig) rescue false
+    # as above but swallow internal errors and return false
+    def soft_verify?(pk, m, sig)
+      begin
+        verify?(pk, m, sig)
+      rescue Secp256k1::Error
+        false
+      end
+    end
 
     #
     # Utility
