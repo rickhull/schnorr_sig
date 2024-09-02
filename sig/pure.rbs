@@ -6,7 +6,7 @@ module SchnorrSig
   class InfinityPoint < Error
   end
 
-  GROUP: ECDSA::Group
+  GROUP: ECDSA::Group::Secp256k1
   P: Integer
   N: Integer
   B: Integer
@@ -21,7 +21,8 @@ module SchnorrSig
     def tagged_hash: (String tag, String msg) -> String
     def pubkey: (String sk) -> String
     def keypair: -> [String, String]
-    def sign: (String sk, String m, ?auxrand: nil) -> String
+    def sign: (String sk, String m, ?auxrand: String) -> String
     def verify?: (String pk, String m, String sig) -> bool
+    def soft_verify?: (String pk, String m, String sig) -> bool
   end
 end

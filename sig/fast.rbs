@@ -2,14 +2,14 @@ module SchnorrSig
   CONTEXT: Secp256k1::Context
 
   module Fast
-    def keypair_obj: (?nil sk) -> Secp256k1::KeyPair
+    def keypair_obj: (?String sk) -> Secp256k1::KeyPair
     def extract_keys: (Secp256k1::KeyPair keypair_obj) -> [String, String]
     def pubkey: (String sk) -> String
     def keypair: -> [String, String]
     def signature: (String str) -> Secp256k1::SchnorrSignature
     def sign: (String sk, String m) -> String
-    def strict_verify?: (String pk, String m, String sig) -> bool
     def verify?: (String pk, String m, String sig) -> bool
+    def soft_verify?: (String pk, String m, String sig) -> bool
     def tagged_hash: (String tag, String msg) -> String
   end
 end
