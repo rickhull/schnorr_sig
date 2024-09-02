@@ -104,11 +104,11 @@ SchnorrSig.tagged_hash('signing', msg) == h  # => true
 
 Here are the fundamental functions common to both implementations:
 
-* `keypair()` returns [32B sk, 32B pk]
-* `pubkey(32B sk)` returns 32B pk
-* `sign(32B sk, str msg)` returns 64B sig
-* `tagged_hash(str tag, str msg)` returns 32B hash
-* `verify?(32B pk, str msg, 64B sig)` returns bool
+* `sign(32B sk, str msg)` *returns* `64B sig`
+* `verify?(32B pk, str msg, 64B sig)` *returns* `bool`
+* `pubkey(32B sk)` *returns* `32B pk`
+* `tagged_hash(str tag, str msg)` *returns* `32B hash`
+* `keypair()` *returns* `[32B sk, 32B pk]`
 
 ### Differences
 
@@ -118,7 +118,7 @@ The fast implementation only signs 32 byte payloads.  It expects to sign
 a hash of the message and not the message itself.  The pure implementation
 is happy to sign any payload.
 
-* Pure: `sign(32B sk, str msg, auxrand: 32B)` (auxrand is optional)
+* Pure: `sign(32B sk, str msg, auxrand: 32B)` *(auxrand is optional)*
 
 The fast implementation always generates `auxrand` at signing time via
 `SecureRandom`.  The pure implementation allows `auxrand` to be passed in,

@@ -112,6 +112,6 @@ module SchnorrSig
     end
   end
 
-  Fast.include(Utils)
-  Fast.extend(Fast)
+  Fast.include Utils
+  Fast.extend Fast
 end

@@ -218,6 +218,6 @@ module SchnorrSig
     end
   end
 
-  Pure.include(Utils)
-  Pure.extend(Pure)
+  Pure.include Utils
+  Pure.extend Pure
 end
