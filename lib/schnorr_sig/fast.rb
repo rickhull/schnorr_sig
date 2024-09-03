@@ -108,8 +108,7 @@ module SchnorrSig
     #   msg: UTF-8 / binary / agnostic
     # Output
     #   32 bytes binary
-    def tagged_hash(tag, msg) = CONTEXT.tagged_sha256(check!(tag, String),
-                                                      check!(msg, String))
+    def tagged_hash(tag, msg) = CONTEXT.tagged_sha256(str!(tag), str!(msg))
   end
 
   Fast.include Utils

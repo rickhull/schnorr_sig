@@ -87,15 +87,12 @@ module SchnorrSig
     # Output
     #   32 bytes binary
     def tagged_hash(tag, msg)
-      check!(tag, String) and check!(msg, String)
-      warn("tag expected to be UTF-8") unless tag.encoding == Encoding::UTF_8
-
       # BIP340: The function hash[name](x) where x is a byte array
       #         returns the 32-byte hash
       #         SHA256(SHA256(tag) || SHA256(tag) || x)
       #         where tag is the UTF-8 encoding of name.
-      tag_hash = Digest::SHA256.digest(tag)
-      Digest::SHA256.digest(tag_hash + tag_hash + msg)
+      tag_hash = Digest::SHA256.digest tag
+      Digest::SHA256.digest(tag_hash + tag_hash + str!(msg).b)
     end
 
     #
@@ -135,7 +132,7 @@ module SchnorrSig
     #   The signature, sig:       64 bytes binary
     def sign(sk, m, auxrand: nil)
       a = auxrand.nil? ? random_bytes(B) : auxrand
-      binary!(sk, KEY) and check!(m, String) and binary!(a, B)
+      binary!(sk, KEY) and str!(m) and binary!(a, B)
 
       # BIP340: Let d' = int(sk)
       # BIP340: Fail if d' = 0 or d' >= n
@@ -186,7 +183,7 @@ module SchnorrSig
     # Output
     #   Boolean
     def verify?(pk, m, sig)
-      binary!(pk, KEY) and check!(m, String) and binary!(sig, SIG)
+      binary!(pk, KEY) and str!(m) and binary!(sig, SIG)
 
       # BIP340: Let P = lift_x(int(pk))
       p = lift_x(int(pk))

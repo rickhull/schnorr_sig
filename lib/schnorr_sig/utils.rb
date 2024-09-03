@@ -12,12 +12,19 @@ module SchnorrSig
     end
 
     # raise SpecError or return str
-    def binary!(str, length)
+    def str!(str, length = nil)
       check!(str, String)
-      if str.encoding != Encoding::BINARY
+      if length and length != str.length
+        raise(SpecError, "Length: #{str.length}")
+      end
+      str
+    end
+
+    # raise SpecError or return str
+    def binary!(str, length)
+      if str!(str, length).encoding != Encoding::BINARY
         raise(SpecError, "Encoding: #{str.encoding}")
       end
-      raise(SpecError, "Length: #{str.length}") if str.length != length
       str
     end
 
