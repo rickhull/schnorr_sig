@@ -13,9 +13,8 @@ module SchnorrSig
 
     # raise SpecError or return str
     def str!(str, length = nil)
-      check!(str, String)
-      if length and length != str.length
-        raise(SpecError, "Length: #{str.length}")
+      if check!(str, String) and !length.nil? and length != str.length
+        raise(SpecError, "Length #{str.length} should be #{length}")
       end
       str
     end
