@@ -34,11 +34,10 @@ module SchnorrSig
     # Output
     #   Secp256k1::KeyPair
     def keypair_obj(sk = nil)
-      if sk
-        binary!(sk, KEY)
-        CONTEXT.key_pair_from_private_key(sk)
-      else
+      if sk.nil?
         CONTEXT.generate_key_pair
+      else
+        CONTEXT.key_pair_from_private_key(binary!(sk, KEY))
       end
     end
 
@@ -69,8 +68,7 @@ module SchnorrSig
     # Output
     #   Secp256k1::SchnorrSignature
     def signature(str)
-      binary!(str, SIG)
-      Secp256k1::SchnorrSignature.from_data(str)
+      Secp256k1::SchnorrSignature.from_data(binary!(str, SIG))
     end
 
     # Input
@@ -78,10 +76,8 @@ module SchnorrSig
     #   The message, m:     32 byte hash value
     # Output
     #   64 bytes binary
-    def sign(sk, m)
-      binary!(sk, KEY) and binary!(m, 32)
-      CONTEXT.sign_schnorr(keypair_obj(sk), m).serialized
-    end
+    def sign(sk, m) = CONTEXT.sign_schnorr(keypair_obj(sk),
+                                           binary!(m, 32)).serialized
 
     # Input
     #   The public key, pk: 32 bytes binary
@@ -112,10 +108,8 @@ module SchnorrSig
     #   msg: UTF-8 / binary / agnostic
     # Output
     #   32 bytes binary
-    def tagged_hash(tag, msg)
-      check!(tag, String) and check!(msg, String)
-      CONTEXT.tagged_sha256(tag, msg)
-    end
+    def tagged_hash(tag, msg) = CONTEXT.tagged_sha256(check!(tag, String),
+                                                      check!(msg, String))
   end
 
   Fast.include Utils
