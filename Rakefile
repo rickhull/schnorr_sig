@@ -1,9 +1,17 @@
 require 'rake/testtask'
 
-Rake::TestTask.new :test do |t|
+Rake::TestTask.new :test => :vectors do |t|
   t.test_files = [
     'test/utils.rb',
     'test/pure.rb',
+  ]
+  t.warning = true
+end
+
+Rake::TestTask.new :fast => :vectors do |t|
+  t.test_files = [
+    'test/utils.rb',
+    'test/fast.rb',
   ]
   t.warning = true
 end
@@ -12,14 +20,6 @@ Rake::TestTask.new :vectors do |t|
   t.test_files = [
     'test/vectors.rb',
     'test/vectors_extra.rb',
-  ]
-  t.warning = true
-end
-
-Rake::TestTask.new :fast do |t|
-  t.test_files = [
-    'test/utils.rb',
-    'test/fast.rb',
   ]
   t.warning = true
 end
