@@ -129,14 +129,9 @@ though `Random` may also be used via `NO_SECURERANDOM` environment variable.
 
 ## Enable Fast Implementation
 
-*The `rbsecp256k1` gem must be installed,
-otherwise there will be a `LoadError`.*
-
-Ensure `ENV['SCHNORR_SIG']&.downcase == 'fast'`, and then
-`require 'schnorr_sig'` will try the fast implementation first, before
-falling back to the pure implementation.
-
-After `require 'schnorr_sig'`, you can check which implementation is loaded
+If the `rbsecp256k1` gem is installed and loadable, it will be loaded and used.
+Otherwise, we fall back to the pure implementation.  After
+`require 'schnorr_sig'`, you can check which implementation is loaded
 by the presence of `SchnorrSig::Pure` or `SchnorrSig::Fast`.
 
 ### Load Directly
