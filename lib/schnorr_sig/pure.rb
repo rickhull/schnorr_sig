@@ -17,12 +17,6 @@ module SchnorrSig
     # Utils
     #
 
-    # use SecureRandom unless ENV['NO_SECURERANDOM'] is nonempty
-    def random_bytes(count)
-      nsr = ENV['NO_SECURERANDOM']
-      (nsr and !nsr.empty?) ? Random.bytes(count) : SecureRandom.bytes(count)
-    end
-
     # int (dot) G, returns ECDSA::Point
     def point(int)
       (GROUP.generator.to_jacobian * int).to_affine # 10x faster via ecdsa_ext

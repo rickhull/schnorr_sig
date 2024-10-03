@@ -38,5 +38,11 @@ module SchnorrSig
 
     # convert a hex string to a binary string
     def hex2bin(hex) = [hex].pack('H*')
+
+    # use SecureRandom unless ENV['NO_SECURERANDOM'] is nonempty
+    def random_bytes(count)
+      nsr = ENV['NO_SECURERANDOM']
+      (nsr and !nsr.empty?) ? Random.bytes(count) : SecureRandom.bytes(count)
+    end
   end
 end
